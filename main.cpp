@@ -4,7 +4,8 @@
 using namespace std;
 
 int main(int argc, const char * argv[]) {
-    string inputFile = "input.txt";
+
+    string inputFile = "input_1.txt";
     
     cout << "=== LOADING BATTLE FROM FILE ===" << endl;
     EniesLobbyBattle battle(inputFile);

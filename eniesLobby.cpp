@@ -1,54 +1,44 @@
 #include "eniesLobby.h"
-
-static int clamp(int value, int lower, int upper)
-{
-    if (value < lower) return lower;
-    if (value > upper) return upper;
-    return value;
-}
-
-static void valid(BattleContext &context)
-{
-    context.morale = clamp(context.morale, 0, 100);
-    context.alarmLevel = clamp(context.alarmLevel, 0, 100);
-    context.rescueProgress = clamp(context.rescueProgress, 0, 100);
-    context.escapeProgress = clamp(context.escapeProgress, 0, 100);
+#define elif else if
+void EniesLobbyBattle::clamp() {
+    if (context.morale < 0) context.morale = 0;
+    if (context.morale > 100) context.morale = 100;
+    if (context.alarmLevel < 0) context.alarmLevel = 0;
+    if (context.alarmLevel > 100) context.alarmLevel = 100;
+    if (context.rescueProgress < 0) context.rescueProgress = 0;
+    if (context.rescueProgress > 100) context.rescueProgress = 100;
+    if (context.escapeProgress < 0) context.escapeProgress = 0;
+    if (context.escapeProgress > 100) context.escapeProgress = 100;
     if (context.busterCallTimer < 0) context.busterCallTimer = 0;
 }
-
-static int myDiv(int numerator, int denominator)
-{
-    return (numerator + denominator - 1) / denominator;
-}
-
 /*
  * BattleContext
  */
-BattleContext::BattleContext()
-{
-    turnCount = 0;
-    morale = 0;
-    alarmLevel = 0;
-    rescueProgress = 0;
-    escapeProgress = 0;
-    busterCallTimer = 0;
-    mainGateDestroyed = false;
-    robinRescued = false;
-    bridgeOpened = false;
-    battleEnded = false;
-    resultCode = "";
+BattleContext::BattleContext() {
+    this->low = INT_MAX;
+    this->turnCount = 0;
+    this->morale = 0;
+    this->alarmLevel = 0;
+    this->rescueProgress = 0;
+    this->escapeProgress = 0;
+    this->busterCallTimer = 0;
+    this->mainGateDestroyed = false;
+    this->robinRescued = false;
+    this->bridgeOpened = false;
+    this->battleEnded = false;
+    this->resultCode = "";
+    
 }
 
-void BattleContext::nextTurn()
-{
-    turnCount = turnCount + 1;
+void BattleContext::nextTurn() {
+    // TODO: implement
+    this->turnCount++;
 }
 
 /*
  * Character
  */
-Character::Character()
-{
+Character::Character() {
     this->name = "";
     this->hp = 0;
     this->maxHp = 0;
@@ -58,983 +48,935 @@ Character::Character()
     this->energy = 0;
     this->alive = false;
 }
-
-Character::Character(string name, int hp, int atk, int def, int speed, int energy)
-{
+int Character::getAtk() const {
+    return this->atk;
+}
+int Character::getDef() const {
+    return this->def;
+}
+void Character::setDef(int def) {
+    this->def=(def < 0) ? 0 : def;
+}
+int Character::getSpeed() const {
+    return this->speed;
+}
+void Character::setSpeed(int speed) {
+    this->speed=(speed < 0) ? 0 : speed;
+}
+int Character::getMaxHP() const {
+    return this->maxHp;
+}
+void Character::setHP(int hp) {
+    this->hp=(hp < 0) ? 0 : hp;
+    if (this->hp==0) alive = false;
+}
+void Character::setEnergy(int energy) {
+    this->energy=(energy < 0) ? 0 : energy;
+}
+bool Character::isDefeated() const {
+    return this->defeated;
+}
+bool Character::isAttacked() const {
+    return this->attacked;
+}
+Character::Character(string name, int hp, int atk, int def, int speed, int energy) {
+    // TODO: implement
     this->name = name;
-    this->hp = hp;
+    this->hp = (hp < 0) ? 0 : hp;
     this->maxHp = hp;
     this->atk = atk;
     this->def = def;
     this->speed = speed;
-    this->energy = energy;
-    this->alive = (hp > 0);
+    this->energy = (energy<0) ? 0 : energy;
+    this->alive=(hp > 0) ? true : false;
 }
 
-Character::~Character() {}
+Character::~Character() {
+    // TODO: implement if needed
+}
 
-int Character::attack(Building *target, BattleContext &context)
-{
+int Character::attack(Building* target, BattleContext& context) {
     return 0;
 }
 
-int Character::specialSkill(Building *target, BattleContext &context)
-{
+int Character::specialSkill(Building* target, BattleContext& context) {
     return 0;
 }
 
-void Character::endTurn(BattleContext &context) {}
-
-int Character::receiveDamage(int incoming)
-{
-    int taken = incoming - def;
-    if (taken < 0) taken = 0;
-    hp = hp - taken;
-    if (hp <= 0)
-    {
-        hp = 0;
-        alive = false;
-    }
-    return taken;
+void Character::endTurn(BattleContext& context) {
+    return ;
 }
 
-int Character::receiveDamageBypass(int incoming, int ignorePercent)
-{
-    int reducedDef = myDiv(def * (100 - ignorePercent), 100);
-    int taken = incoming - reducedDef;
-    if (taken < 0) taken = 0;
-    hp = hp - taken;
-    if (hp <= 0)
-    {
-        hp = 0;
-        alive = false;
-    }
-    return taken;
+void Character::receiveDamage(int damage) {
+    // TODO: implement
+    int actualDam= (damage - this->def > 0) ? damage - this->def : 0;
+    this->hp=(this->hp - actualDam > 0) ? this->hp - actualDam : 0;
+    if(hp==0) alive=false;
 }
 
-void Character::receiveHeal(int amount)
-{
-    hp = hp + amount;
-    if (hp > maxHp) hp = maxHp;
-    if (hp > 0) alive = true;
+bool Character::isAlive() const {
+    // TODO: implement
+    return this->alive;
 }
 
-void Character::reduceSpeed(int decrement)
-{
-    speed = speed - decrement;
-    if (speed < 0) speed = 0;
+string Character::getName() const {
+    // TODO: implement
+    return this->name;
 }
 
-void Character::reduceDef(int decrement)
-{
-    def = def - decrement;
-    if (def < 0) def = 0;
+int Character::getHP() const {
+    // TODO: implement
+    return this->hp;
 }
 
-bool Character::isAlive() const { return this->alive; }
-string Character::getName() const { return this->name; }
-int Character::getHP() const { return this->hp; }
-int Character::getMaxHp() const { return this->maxHp; }
-int Character::getDef() const { return this->def; }
-int Character::getSpeed() const { return this->speed; }
-int Character::getEnergy() const { return this->energy; }
-bool Character::isStrawHat() const { return false; }
-bool Character::isCP9() const { return false; }
+int Character::getEnergy() const {
+    // TODO: implement
+    return this->energy;
+}
 
+bool Character::isStrawHat() const {
+    return false;
+}
+
+bool Character::isCP9() const {
+    return false;
+}
+string Building::getName() const {
+    return this->name;
+}
+int Building::getMaxHP() const {
+    return this->maxHP;
+}
+int Building::getHp() const {
+    return this->hp;
+}
 /*
  * StrawHat
  */
-StrawHat::StrawHat() : Character() { bounty = 0; }
-
-StrawHat::StrawHat(string name, int hp, int atk, int def, int speed, int energy, long long bounty)
-    : Character(name, hp, atk, def, speed, energy)
-{
-    this->bounty = bounty;
+/*Băng Mũ Rơm là lựhouse lượng chính trong trận chiến tại Enies Lobby với mụhouse tiêu giải cứu Robin.
+Cáhouse thành viên trong băng đều kế thừa từ lớp StrawHat, là lớp con của Character.
+Yêu cầu: Hiện thựhouse class StrawHat với cáhouse mô tả sau:
+1. Cáhouse thuộhouse tính protected:
+• bounty: kiểu long long, tiền truy nã của nhân vật.
+2. Constructor (public) nhận cáhouse tham số giống lớp Character, đồng thời nhận thêm bounty
+để khởi tạo cáhouse thuộhouse tính tương ứng.
+1 StrawHat(string name, int hp, int atk, int def,
+2
+int speed, int energy, long long bounty);
+3. Phương thứhouse isStrawHat:
+Bài tập lớn môn Kỹ thuật lập trình- HK 2 năm họhouse 2025- 2026
+Trang 4/23
+TRƯỜNG ĐẠI HỌC BÁCH KHOA- ĐHQG-HCM
+KHOA KHOA HỌC VÀ KỸ THUẬT MÁY TÍNH
+1 virtual bool isStrawHat() const;
+Trả về giá trị true nếu nhân vật thuộhouse băng Mũ Rơm, ngượhouse lại trả về false. Phương
+thứhouse này đượhouse sử dụng để xáhouse định phe của nhân vật trong quá trình xử lý trận đánh.
+4. Phương thứhouse str:
+1 virtual string str() const;
+Trả về chuỗi biểu diễn thông tin của nhân vật thuộhouse băng Mũ Rơm. Chuỗi trả về có định
+dạng như sau:
+1 StrawHat[name=<name>, hp=<hp>, atk=<atk>, def=<def>, speed=<speed>,
+energy=<energy>, bounty=<bounty>]
+Cáhouse giá trị đượhouse in liền nhau, phân tách bằng dấu phẩy và không có khoảng trắng dư
+thừa ngoài định dạng đã cho.
+Ví dụ:
+1 StrawHat[name=Luffy, hp=120, atk=35, def=20, speed=25, energy=50, bounty
+=150000000]
+5. Cáhouse phương thứhouse kế thừa từ Character sẽ đượhouse override ở cáhouse lớp con cụ thể.
+6. Khi một thành viên của băng hạ gụhouse một đặhouse vụ CP9, nếu mô tả của nhân vật không
+nói gì về morale thì mặhouse định giá trị morale trong BattleContext sẽ tăng thêm 5.*/
+StrawHat::StrawHat() : Character() {
+    this->bounty = 0;
 }
 
-bool StrawHat::isStrawHat() const { 
-    return true; 
+StrawHat::StrawHat(string name, int hp, int atk, int def,
+                   int speed, int energy, long long bounty) {
+    this->name=name;
+    this->hp=(hp<0) ? 0 : hp;
+    this->maxHp=hp;
+    this->atk=atk;
+    this->def=def;
+    this->speed=speed;
+    this->energy=(energy<0) ? 0 : energy;
+    this->alive=(hp>0) ? true : false;
+    this->bounty=bounty;
+
 }
 
-string StrawHat::str() const
-{
-    ostringstream out;
-    out << "StrawHat[name=" << name << ", hp=" << hp << ", atk=" << atk<< ", def=" << def << ", speed=" << speed << ", energy=" << energy<< ", bounty=" << bounty << "]";
-    return out.str();
+bool StrawHat::isStrawHat() const {
+    return true;
+    // TODO: implement
+}
+
+string StrawHat::str() const {
+    // TODO: implement
+    return "StrawHat[name=" + name + ", hp=" + to_string(hp) + ", atk=" + to_string(atk) + ", def=" + to_string(def) + ", speed=" + to_string(speed) + ", energy=" + to_string(energy) + ", bounty=" + to_string(bounty) + "]";
 }
 
 /*
  * Luffy
  */
-static int computeLuffyDamage(int atkVal, int currentHp, int maxHpVal)
-{
-    if (currentHp > maxHpVal * 50 / 100) return atkVal;
-    if (currentHp > maxHpVal * 30 / 100) return myDiv(atkVal * 115, 100);
-    return myDiv(atkVal * 130, 100);
+Luffy::Luffy(string name, int hp, int atk, int def,int speed, int energy, long long bounty) : StrawHat(name, hp, atk, def, speed, energy, bounty) {
+    // TODO: implement
 }
 
-Luffy::Luffy(string name, int hp, int atk, int def, int speed, int energy, long long bounty)
-    : StrawHat(name, hp, atk, def, speed, energy, bounty)
-{
-    killedThisTurn = false;
-}
-
-int Luffy::attack(Character *target, BattleContext &context)
-{
-    int dmg = computeLuffyDamage(atk, hp, maxHp);
-    int before = target->getHP();
-    int dealt = target->receiveDamage(dmg);
-    if (before > 0 && !target->isAlive())
-    {
-        context.morale = context.morale + 5;
-        valid(context);
-        killedThisTurn = true;
+int Luffy::attack(Character* target, BattleContext& context) {
+    // TODO: implement
+    this->attacked=true;
+    double percent=this->hp*1.0/maxHp;
+    double dam=0;
+    if(percent>=0.5) dam=atk;
+    elif(percent>=0.3) dam=ceil(this->atk*1.15);
+    else dam=ceil(atk*1.3);
+    target->receiveDamage((int)ceil(dam));
+    int actualDam= (int)ceil(dam) - target->getDef();
+    if(!target->isAlive()) {
+        this->defeated=true;
+        context.morale+=5;
     }
-    return dealt;
+    return max(0,(int)actualDam);
 }
 
-int Luffy::specialSkill(Character *target, BattleContext &context)
-{
-    if (energy < 20 || hp < myDiv(maxHp * 15, 100)) return 0;
-    energy = energy - 20;
-    int dmg = myDiv(atk * 200, 100);
-    atk = atk + 15;
-    speed = speed + 15;
-    context.alarmLevel = context.alarmLevel + 10;
-    valid(context);
-    int selfHarm = myDiv(maxHp * 8, 100);
-    hp = hp - selfHarm;
-    if (hp <= 0)
-    {
-        hp = 0;
-        alive = false;
+int Luffy::specialSkill(Character* target, BattleContext& context) {
+    // TODO: implement
+    this->attacked=true;
+    if(this->energy<20 || this->hp*1.0<this->maxHp*0.15) return 0;
+    this->energy-=20;
+    int dam=ceil(this->atk*2);
+    this->speed+=15;
+    this->atk+=15;
+    int actualDam= (int)ceil(dam) - target->getDef();
+    this->hp-= (int)ceil(0.08*maxHp);
+    target->receiveDamage((int)ceil(dam));
+        if(!target->isAlive()) {
+        defeated=true;
     }
-    int before = target->getHP();
-    int dealt = target->receiveDamage(dmg);
-    if (before > 0 && !target->isAlive())
-    {
-        context.morale = context.morale + 5;
-        valid(context);
-        killedThisTurn = true;
-    }
-    return dealt;
+    context.alarmLevel+=10;
+    return max(0,actualDam);
 }
 
-int Luffy::attack(Building *target, BattleContext &context)
-{
-    int dmg = computeLuffyDamage(atk, hp, maxHp);
-    target->receiveDamage(dmg);
-    return dmg;
+int Luffy::attack(Building* target, BattleContext& context) {
+    double percent=this->hp*1.0/this->maxHp;
+    double dam=0;
+    if(percent>=0.5) dam=atk;
+    elif(percent>=0.3) dam=ceil(atk*1.15);
+    else dam=ceil(atk*1.3);
+    target->receiveDamage((int)ceil(dam));
+    return max(0,(int)ceil(dam));
 }
 
-int Luffy::specialSkill(Building *target, BattleContext &context)
-{
-    if (energy < 20 || hp < myDiv(maxHp * 15, 100)) return 0;
-    energy = energy - 20;
-    int dmg = myDiv(atk * 200, 100);
-    atk = atk + 15;
-    speed = speed + 15;
-    context.alarmLevel = context.alarmLevel + 10;
-    valid(context);
-    int selfHarm = myDiv(maxHp * 8, 100);
-    hp = hp - selfHarm;
-    if (hp <= 0)
-    {
-        hp = 0;
-        alive = false;
-    }
-    target->receiveDamage(dmg);
-    return dmg;
+int Luffy::specialSkill(Building* target, BattleContext& context) {
+    this->attacked=true;
+    if(this->energy<20 || this->hp*1.0<this->maxHp*0.15) return 0;
+    this->energy-=20;
+    int dam=ceil(this->atk*2);
+    this->speed+=15;
+    this->atk+=15;
+    this->hp=this->hp - (int)ceil(0.08*maxHp);
+    context.alarmLevel+=10;
+    target->receiveDamage((int)ceil(dam));
+    return max(0,(int)(ceil(dam)));
 }
 
-void Luffy::endTurn(BattleContext &context)
-{
-    if (hp <= maxHp * 30 / 100)
-    {
-        context.morale = context.morale + 3;
-        valid(context);
-    }
-    if (killedThisTurn) energy = energy + 5;
-    killedThisTurn = false;
+void Luffy::endTurn(BattleContext& context) {
+    // TODO: implement
+    if((this->hp*1.0/this->maxHp)<=0.3) context.morale+=3;
+    if(this->defeated) this->energy+=5;
+    this->defeated=false;
 }
 
 /*
  * Zoro
  */
-Zoro::Zoro(string name, int hp, int atk, int def, int speed, int energy, long long bounty)
-    : StrawHat(name, hp, atk, def, speed, energy, bounty)
-{
-    killedThisTurn = false;
+Zoro::Zoro(string name, int hp, int atk, int def, int speed, int energy, long long bounty) : StrawHat(name, hp, atk, def, speed, energy, bounty) {
+    // TODO: implement
 }
 
-int Zoro::attack(Character *target, BattleContext &context)
-{
-    int dmg = atk + myDiv(def * 20, 100);
-    if (target->getHP() < myDiv(target->getMaxHp() * 40, 100))
-    {
-        dmg = myDiv(dmg * 115, 100);
+int Zoro::attack(Character* target, BattleContext& context) {
+    double dam=this->atk+ceil(0.2*this->def);
+    if(target->getHP()<0.4*this->maxHp) dam=ceil(dam*1.15);
+    target->receiveDamage((int)ceil(dam));
+    int actualDam= (int)ceil(dam) - target->getDef();
+    if(!target->isAlive()) {
+        this->defeated=true;
     }
-    int before = target->getHP();
-    int dealt = target->receiveDamage(dmg);
-    if (before > 0 && !target->isAlive())
-    {
-        context.morale = context.morale + 5;
-        valid(context);
-        killedThisTurn = true;
-    }
-    return dealt;
+    // TODO: implement
+    return max(0,actualDam);
 }
 
-int Zoro::specialSkill(Character *target, BattleContext &context)
-{
-    if (energy < 15) return 0;
-    energy = energy - 15;
-    int dmg = myDiv(atk * 220, 100);
-    if (target->getHP() < myDiv(target->getMaxHp() * 50, 100))
-    {
-        dmg = myDiv(dmg * 150, 100);
+int Zoro::specialSkill(Character* target, BattleContext& context) {
+    // TODO: implement
+    if(this->energy<15) return 0;
+    this->energy-=15;
+    double dam=ceil(2.2*atk);
+    if(target->getHP()<0.5*maxHp) dam=ceil(dam*1.5);
+    target->receiveDamage((int)ceil(dam));
+    int actualDam= (int)ceil(dam) - target->getDef();
+    if(!target->isAlive()) {
+        this->defeated=true;
+        context.morale+=4;
+        this->energy+=8;
     }
-    int before = target->getHP();
-    int dealt = target->receiveDamage(dmg);
-    if (before > 0 && !target->isAlive())
-    {
-        energy = energy + 8;
-        context.morale = context.morale + 4;
-        valid(context);
-        killedThisTurn = true;
-        context.morale = context.morale + 5;
-        valid(context);
-    }
-    return dealt;
+    return max(0,actualDam);
 }
 
-int Zoro::attack(Building *target, BattleContext &context)
-{
-    int dmg = atk + myDiv(def * 20, 100);
-    target->receiveDamage(dmg);
-    return dmg;
+int Zoro::attack(Building* target, BattleContext& context) {
+    // TODO: implement
+    double dam=this->atk+ceil(0.2*this->def);
+    if(target->getHp()<0.4*target->getMaxHP()) dam=ceil(dam*1.15);
+    target->receiveDamage((int)ceil(dam));
+    return max(0,(int)ceil(dam));
 }
 
-int Zoro::specialSkill(Building *target, BattleContext &context)
-{
-    if (energy < 15) return 0;
-    energy = energy - 15;
-    int dmg = myDiv(atk * 220, 100);
-    target->receiveDamage(dmg);
-    return dmg;
+int Zoro::specialSkill(Building* target, BattleContext& context) {
+    // TODO: implement
+        if(this->energy<15) return 0;
+    this->energy-=15;
+    double dam = ceil(2.2*this->atk);
+    if(target->getHp()<0.5*target->getMaxHP()) dam=ceil(dam*1.5);
+    target->receiveDamage((int)ceil(dam));
+    return max(0,(int)ceil(dam));
 }
 
-void Zoro::endTurn(BattleContext &context)
-{
-    if (killedThisTurn)
-    {
-        context.morale = context.morale + 6;
-        valid(context);
-        atk = myDiv(atk * 105, 100);
+void Zoro::endTurn(BattleContext& context) {
+    // TODO: implement
+    if(this->defeated){
+        context.morale+=6;
+        this->atk*=1.05;
     }
-    killedThisTurn = false;
+    this->defeated=false;
 }
 
 /*
  * Sanji
  */
-Sanji::Sanji(string name, int hp, int atk, int def, int speed, int energy, long long bounty)
-    : StrawHat(name, hp, atk, def, speed, energy, bounty)
-{
-    killedThisTurn = false;
+Sanji::Sanji(string name, int hp, int atk, int def,
+             int speed, int energy, long long bounty) : StrawHat(name, hp, atk, def, speed, energy, bounty) {
+    // TODO: implement
 }
 
-int Sanji::attack(Character *target, BattleContext &context)
-{
-    int dmg = atk + myDiv(speed * 50, 100);
-    if (target->getDef() < def)
-    {
-        dmg = myDiv(dmg * 110, 100);
+int Sanji::attack(Character* target, BattleContext& context) {
+    // TODO: implement
+    double dam=this->atk+ceil(0.5*this->speed);
+    if(this->def > target->getDef()) dam=ceil(dam*1.1);
+    target->receiveDamage((int)ceil(dam));
+    int actualDam= (int)ceil(dam) - target->getDef();
+    if(!target->isAlive()) {
+        this->defeated=true;
     }
-    int before = target->getHP();
-    int dealt = target->receiveDamage(dmg);
-    if (before > 0 && !target->isAlive())
-    {
-        context.morale = context.morale + 5;
-        valid(context);
-        killedThisTurn = true;
+    return max(0,actualDam);
+}
+
+int Sanji::specialSkill(Character* target, BattleContext& context) {
+    // TODO: implement
+    if(this->energy<18) return 0;
+    this->energy-=18;
+    double dam=ceil(2.1*atk);
+    target->receiveDamage((int)ceil(dam));
+    int actualDam= (int)ceil(dam) - target->getDef();
+    if(target->getName()=="Jabra") target->setDef(target->getDef()-12);
+    else target->setDef(target->getDef()-8);
+    if(!target->isAlive()) {
+        defeated=true;
     }
-    return dealt;
+    return max(0,actualDam);
 }
 
-int Sanji::specialSkill(Character *target, BattleContext &context)
-{
-    if (energy < 18) return 0;
-    energy = energy - 18;
-    int dmg = myDiv(atk * 210, 100);
-    int before = target->getHP();
-    int dealt = target->receiveDamage(dmg);
-    bool slain = (before > 0 && !target->isAlive());
-    if (slain)
-    {
-        context.morale = context.morale + 5;
-        valid(context);
-        killedThisTurn = true;
+int Sanji::attack(Building* target, BattleContext& context) {
+    // TODO: implement
+    double dam=atk+ceil(0.5*speed);
+    target->receiveDamage((int)ceil(dam));
+    return max(0,(int)ceil(dam));
+}
+
+int Sanji::specialSkill(Building* target, BattleContext& context) {
+    if(energy<18) return 0;
+    energy-=18;
+    double dam=ceil(2.1*atk);
+    target->receiveDamage((int)ceil(dam));
+    return max(0,(int)ceil(dam));
+}
+
+void Sanji::endTurn(BattleContext& context) {
+    // TODO: implement
+    if(this->defeated) {
+        context.morale+=8;
+        this->atk=ceil(this->atk*1.1);
+        this->defeated=false;
     }
-    int reduction = 8;
-    if (target->getName() == "Jabra") reduction = 12;
-    target->reduceDef(reduction);
-    return dealt;
-}
 
-int Sanji::attack(Building *target, BattleContext &context)
-{
-    int dmg = atk + myDiv(speed * 50, 100);
-    target->receiveDamage(dmg);
-    return dmg;
-}
-
-int Sanji::specialSkill(Building *target, BattleContext &context)
-{
-    if (energy < 18) return 0;
-    energy = energy - 18;
-    int dmg = myDiv(atk * 210, 100);
-    target->receiveDamage(dmg);
-    return dmg;
-}
-
-void Sanji::endTurn(BattleContext &context)
-{
-    if (killedThisTurn)
-    {
-        context.morale = context.morale + 8;
-        valid(context);
-        atk = myDiv(atk * 110, 100);
-    }
-    killedThisTurn = false;
 }
 
 /*
  * Nami
  */
-Nami::Nami(string name, int hp, int atk, int def, int speed, int energy, long long bounty)
-    : StrawHat(name, hp, atk, def, speed, energy, bounty)
-{
-    killedThisTurn = false;
+Nami::Nami(string name, int hp, int atk, int def,
+           int speed, int energy, long long bounty) : StrawHat(name, hp, atk, def, speed, energy, bounty) {
+    // TODO: implement
 }
 
-int Nami::attack(Character *target, BattleContext &context)
-{
-    int before = target->getHP();
-    int dealt = target->receiveDamageBypass(atk, 30);
-    if (before > 0 && !target->isAlive())
-    {
-        context.morale = context.morale + 5;
-        valid(context);
-        killedThisTurn = true;
+int Nami::attack(Character* target, BattleContext& context) {
+    // TODO: implement
+    double dam=this->atk+floor(0.3*target->getDef());
+    target->receiveDamage((int)ceil(dam));
+    int actualDam= (int)ceil(dam) - target->getDef();
+    if(!target->isAlive()) {
+        this->defeated=true;
     }
-    return dealt;
+    return max(0,actualDam);
 }
 
-int Nami::specialSkill(Character *target, BattleContext &context)
-{
-    if (energy < 20) return 0;
-    energy = energy - 20;
-    int dmg = atk + 40;
-    int before = target->getHP();
-    int dealt = target->receiveDamage(dmg);
-    if (before > 0 && !target->isAlive())
-    {
-        context.morale = context.morale + 5;
-        valid(context);
-        killedThisTurn = true;
+int Nami::specialSkill(Character* target, BattleContext& context) {
+    // TODO: implement
+    if(this->energy<20) return 0;
+    this->energy-=20;
+    double dam=this->atk+40;
+    target->receiveDamage((int)ceil(dam));
+    target->setSpeed(target->getSpeed()-10);
+    int actualDam= (int)ceil(dam) - target->getDef();
+    if(!target->isAlive()) {
+        this->defeated=true;
     }
-    target->reduceSpeed(10);
-    context.busterCallTimer = context.busterCallTimer + 1;
-    context.alarmLevel = context.alarmLevel - 5;
-    valid(context);
-    return dealt;
+    context.busterCallTimer++;
+    context.alarmLevel-=5;
+    return max(0,actualDam);
 }
 
-int Nami::attack(Building *target, BattleContext &context)
-{
-    int dmg = myDiv(atk * 50, 100);
-    target->receiveDamage(dmg);
-    return dmg;
+int Nami::attack(Building* target, BattleContext& context) {
+    // TODO: implement
+    double dam=ceil(atk*0.5);
+    target->receiveDamage((int)ceil(dam));
+    return max(0,(int)ceil(dam));
 }
 
-int Nami::specialSkill(Building *target, BattleContext &context)
-{
-    if (energy < 20) return 0;
-    energy = energy - 20;
-    int dmg = myDiv((atk + 40) * 150, 100);
-    target->receiveDamage(dmg);
-    context.busterCallTimer = context.busterCallTimer + 1;
-    context.alarmLevel = context.alarmLevel - 5;
-    valid(context);
-    return dmg;
+int Nami::specialSkill(Building* target, BattleContext& context) {
+    // TODO: implement
+    if(this->energy<20) return 0;
+    this->energy-=20;
+    double dam=(this->atk+40)+ceil((this->atk+40)*0.5);
+    target->receiveDamage((int)ceil(dam));
+    context.busterCallTimer++;
+    context.alarmLevel-=5;
+    return max(0,(int)ceil(dam));
 }
 
-void Nami::endTurn(BattleContext &context)
-{
-    if (killedThisTurn) energy = energy + 6;
-    killedThisTurn = false;
+void Nami::endTurn(BattleContext& context) {
+    // TODO: implement
+    if(this->defeated) {
+        this->energy+=6;
+            context.morale+=5;
+    }
+            this->defeated=false;
 }
 
 /*
  * Chopper
  */
-Chopper::Chopper(string name, int hp, int atk, int def, int speed, int energy, long long bounty)
-    : StrawHat(name, hp, atk, def, speed, energy, bounty) {}
-
-int Chopper::attack(Character *target, BattleContext &context)
-{
-    int before = target->getHP();
-    int dealt = target->receiveDamage(atk);
-    if (before > 0 && !target->isAlive())
-    {
-        context.morale = context.morale + 5;
-        valid(context);
-    }
-    return dealt;
+Chopper::Chopper(string name, int hp, int atk, int def,
+                 int speed, int energy, long long bounty) : StrawHat(name, hp, atk, def, speed, energy, bounty) {
+    // TODO: implement
 }
 
-int Chopper::specialSkill(Character *target, BattleContext &context)
-{
-    if (energy < 15) return 0;
-    energy = energy - 15;
-    int healing = 35 + myDiv(atk * 50, 100);
-    target->receiveHeal(healing);
-    if (target->getName() == "Luffy")
-    {
-        context.morale = context.morale + 5;
-        valid(context);
+int Chopper::attack(Character* target, BattleContext& context) {
+    // TODO: implement
+        double dam=atk;
+        target->receiveDamage((int)ceil(dam));
+        int actualDam= (int)ceil(dam) - target->getDef();
+        if(!target->isAlive()) {
+            defeated=true;
+        }
+    return max(0,actualDam);
+}
+
+int Chopper::specialSkill(Character* target, BattleContext& context) {
+    // TODO: implement
+    if(energy<15) return 0;
+    energy-=15;
+    double heal=35+ceil(0.5*atk);
+    double healHp=(target->getHP() + heal > target->getMaxHP()) ? target->getMaxHP() - target->getHP() : heal;
+    target->setHP(target->getHP() + (int)ceil(healHp));
+    if(target->getName()=="Luffy") {
+        context.morale+=5;
     }
     return 0;
 }
 
-int Chopper::attack(Building *target, BattleContext &context)
-{
-    target->receiveDamage(atk);
-    return atk;
+int Chopper::attack(Building* target, BattleContext& context) {
+    // TODO: implement
+            double dam=atk ;
+            target->receiveDamage((int)ceil(dam));
+    return max(0,(int)ceil(dam));
 }
 
-void Chopper::endTurn(BattleContext &context) {}
+void Chopper::endTurn(BattleContext& context) {
+    // TODO: implement
+    if(defeated) {
+        context.morale+=5;
+    }
+    defeated=false;
+}
 
 /*
  * Usopp
  */
-Usopp::Usopp(string name, int hp, int atk, int def, int speed, int energy, long long bounty)
-    : StrawHat(name, hp, atk, def, speed, energy, bounty)
-{
-    attackedThisTurn = false;
+Usopp::Usopp(string name, int hp, int atk, int def,
+             int speed, int energy, long long bounty) : StrawHat(name, hp, atk, def, speed, energy, bounty) {
+    // TODO: implement
 }
 
-int Usopp::attack(Character *target, BattleContext &context)
-{
-    int dmg = atk;
-    if (target->getSpeed() < 50)
-    {
-        dmg = myDiv(dmg * 120, 100);
+int Usopp::attack(Character* target, BattleContext& context) {
+    // TODO: implement
+        double dam=atk;
+        if(target->getSpeed()<50) dam=ceil(dam*1.2);
+        target->receiveDamage((int)ceil(dam));
+        if(!target->isAlive()) {
+            defeated=true;
+        }
+    int actualDam= (int)ceil(dam) - target->getDef();
+    return max(0,actualDam);
+}
+
+int Usopp::specialSkill(Character* target, BattleContext& context) {
+    // TODO: implement
+    if(energy<16) return 0;
+    energy-=16;
+    double dam=ceil(atk*0.8);
+    target->setSpeed((int)(target->getSpeed()-12));
+    target->receiveDamage((int)ceil(dam));
+    if(!target->isAlive()) {
+        defeated=true;
     }
-    int before = target->getHP();
-    int dealt = target->receiveDamage(dmg);
-    if (before > 0 && !target->isAlive())
-    {
-        context.morale = context.morale + 5;
-        valid(context);
-    }
-    attackedThisTurn = true;
-    return dealt;
+    context.escapeProgress+=8;
+    int actualDam= (int)ceil(dam) - target->getDef();
+    return max(0,actualDam);
 }
 
-int Usopp::specialSkill(Character *target, BattleContext &context)
-{
-    if (energy < 16) return 0;
-    energy = energy - 16;
-    int dmg = myDiv(atk * 80, 100);
-    target->reduceSpeed(12);
-    int before = target->getHP();
-    int dealt = target->receiveDamage(dmg);
-    if (before > 0 && !target->isAlive())
-    {
-        context.morale = context.morale + 5;
-        valid(context);
-    }
-    context.escapeProgress = context.escapeProgress + 8;
-    valid(context);
-    attackedThisTurn = true;
-    return dealt;
+int Usopp::attack(Building* target, BattleContext& context) {
+    // TODO: implement
+            double dam=atk*0.5;
+        target->receiveDamage((int)ceil(dam));
+    return max(0,(int)ceil(dam));
 }
 
-int Usopp::attack(Building *target, BattleContext &context)
-{
-    int dmg = myDiv(atk * 50, 100);
-    target->receiveDamage(dmg);
-    attackedThisTurn = true;
-    return dmg;
+int Usopp::specialSkill(Building* target, BattleContext& context) {
+    if(energy<16) return 0;
+    energy-=16;
+    double dam=ceil(atk*0.8);
+    target->receiveDamage((int)ceil(dam));
+    context.escapeProgress+=8;
+    return max(0,(int)ceil(dam));
 }
 
-int Usopp::specialSkill(Building *target, BattleContext &context)
-{
-    if (energy < 16) return 0;
-    energy = energy - 16;
-    int dmg = myDiv(atk * 80, 100);
-    target->receiveDamage(dmg);
-    context.escapeProgress = context.escapeProgress + 8;
-    valid(context);
-    attackedThisTurn = true;
-    return dmg;
-}
-
-void Usopp::endTurn(BattleContext &context)
-{
-    if (attackedThisTurn)
-    {
-        context.morale = context.morale + 10;
-        valid(context);
-    }
-    attackedThisTurn = false;
+void Usopp::endTurn(BattleContext& context) {
+    // TODO: implement
+    context.morale+=10;
+    defeated=false;
 }
 
 /*
  * Franky
  */
-Franky::Franky(string name, int hp, int atk, int def, int speed, int energy, long long bounty)
-    : StrawHat(name, hp, atk, def, speed, energy, bounty) {}
-
-int Franky::attack(Character *target, BattleContext &context)
-{
-    int dmg = atk + myDiv(def * 30, 100);
-    if (target->isCP9())
-    {
-        dmg = myDiv(dmg * 110, 100);
-    }
-    int before = target->getHP();
-    int dealt = target->receiveDamage(dmg);
-    if (before > 0 && !target->isAlive())
-    {
-        context.morale = context.morale + 5;
-        valid(context);
-    }
-    return dealt;
+Franky::Franky(string name, int hp, int atk, int def,
+               int speed, int energy, long long bounty) : StrawHat(name, hp, atk, def, speed, energy, bounty) {
+    // TODO: implement
 }
 
-int Franky::specialSkill(Character *target, BattleContext &context)
-{
-    if (energy >= 30)
-    {
-        // Coup de Vent (30 energy)
-        energy -= 30;
-        int dmg = myDiv(atk * 120, 100);  // 120% atk
-        
-        int before = target->getHP();
-        int dealt = target->receiveDamage(dmg);
-        if (before > 0 && !target->isAlive())
-        {
-            context.morale += 5;
-            valid(context);
-        }
-        return dealt;
-    }
-    else if (energy >= 20)
-    {
-        // Strong Right (20 energy)
-        energy -= 20;
-        int dmg = myDiv(atk * 180, 100);  // 180% atk
-        
-        if (target->getName() == "Lucci")
-            dmg = myDiv(dmg * 120, 100);  // +20% vs Lucci
-        
-        target->reduceSpeed(8);
-        
-        int before = target->getHP();
-        int dealt = target->receiveDamage(dmg);
-        if (before > 0 && !target->isAlive())
-        {
-            context.morale += 5;
-            valid(context);
-        }
-        return dealt;
-    }
-    return 0;
-}
-int Franky::attack(Building *target, BattleContext &context)
-{
-    int dmg = atk + myDiv(def * 30, 100);
-    target->receiveDamage(dmg);
-    return dmg;
+int Franky::attack(Character* target, BattleContext& context) {
+    // TODO: implement
+        double dam=this->atk+ceil(0.3*this->def);
+        if(target->isCP9()) dam=dam+ceil(dam*0.1);
+            target->receiveDamage((int)ceil(dam));
+            if(!target->isAlive()) {
+                this->defeated=true;
+            }
+    int actualDam= (int)ceil(dam) - target->getDef();
+    return max(0,actualDam);
 }
 
-int Franky::specialSkill(Building *target, BattleContext &context)
-{
-    if (energy < 30) return 0;
-    energy = energy - 30;
-    target->forceDestroy();
-    return myDiv(atk * 120, 100);
+int Franky::specialSkill(Character* target, BattleContext& context) {
+    // TODO: implement
+    if(energy<20) return 0;
+    if(energy<30){
+    energy-=20;
+    double dam=atk+ceil(0.8*atk);
+    if(target->getName()=="Lucci") dam=dam+ceil(dam*0.2);
+    target->receiveDamage((int)ceil(dam));
+    if(!target->isAlive()) {
+        defeated=true;
+    }
+    target->setSpeed((int)(target->getSpeed()-8));
+    return max(0,(int)(ceil(dam))-target->getDef());
+    }
+    energy-=30;
+    double dam=atk+ceil(0.2*atk);
+    target->receiveDamage((int)ceil(dam));
+    if(!target->isAlive()) {
+        defeated=true;
+    }
+    return max(0,(int)(ceil(dam))-target->getDef());
 }
 
-void Franky::endTurn(BattleContext &context)
-{
-    if (hp > maxHp * 70 / 100)
-    {
-        def = def + 5;
+int Franky::attack(Building* target, BattleContext& context) {
+            double dam=atk+ceil(0.3*def);
+            target->receiveDamage((int)ceil(dam));
+            return max(0,(int)(ceil(dam)));
+}
+
+int Franky::specialSkill(Building* target, BattleContext& context) {
+    if(energy<20) return 0;
+    if(energy<30){
+    energy-=20;
+    double dam=atk+ceil(0.8*atk);
+    target->receiveDamage((int)ceil(dam));
+    return max(0,(int)(ceil(dam)));
     }
-    if (hp < myDiv(maxHp * 30, 100))
-    {
-        atk = myDiv(atk * 110, 100);
+    energy-=30;
+    target->receiveDamage(target->getHp());
+    return max(0,target->getHp());
+}
+
+void Franky::endTurn(BattleContext& context) {
+    // TODO: implement
+    if(defeated) {
+        context.morale+=5;
     }
+    if(hp>0.7*maxHp) def+=5;
+    elif(hp<0.3*maxHp) atk=atk+ceil(atk*0.1);
+    defeated=false;
 }
 
 /*
  * CP9Agent
  */
-CP9Agent::CP9Agent() : Character() { doriki = 0; }
-
-CP9Agent::CP9Agent(string name, int hp, int atk, int def, int speed, int energy, int doriki)
-    : Character(name, hp, atk, def, speed, energy)
-{
-    this->doriki = doriki;
+CP9Agent::CP9Agent() : Character() {
+    doriki = 0;
 }
 
-bool CP9Agent::isCP9() const { return true; }
+CP9Agent::CP9Agent(string name, int hp, int atk, int def,
+                   int speed, int energy, int doriki ) : Character(name, hp, atk, def, speed, energy), doriki(doriki) {
+    // TODO: implement
+}
 
-string CP9Agent::str() const
-{
-    ostringstream out;
-    out << "CP9[name=" << name << ", hp=" << hp << ", atk=" << atk
-        << ", def=" << def << ", speed=" << speed << ", energy=" << energy
-        << ", doriki=" << doriki << "]";
-    return out.str();
+bool CP9Agent::isCP9() const {
+    // TODO: implement
+    return true;
+}
+
+string CP9Agent::str() const {
+    // TODO: implement
+    return "CP9[name=" + name + ", hp=" + to_string(hp) + ", atk=" + to_string(atk) + ", def=" + to_string(def) + ", speed=" + to_string(speed) + ", energy=" + to_string(energy) + ", doriki=" + to_string(doriki) + "]";
 }
 
 /*
  * Lucci
  */
-Lucci::Lucci(string name, int hp, int atk, int def, int speed, int energy, int doriki)
-    : CP9Agent(name, hp, atk, def, speed, energy, doriki) {}
-
-int Lucci::attack(Character *target, BattleContext &context)
-{
-    int dmg = atk + doriki / 20;
-    if (target->getHP() < myDiv(target->getMaxHp() * 50, 100))
-    {
-        dmg = myDiv(dmg * 120, 100);
-    }
-    int before = target->getHP();
-    int dealt = target->receiveDamage(dmg);
-    if (before > 0 && !target->isAlive())
-    {
-        context.morale = context.morale - 5;
-        valid(context);
-    }
-    return dealt;
+Lucci::Lucci(string name, int hp, int atk, int def,
+             int speed, int energy, int doriki) : CP9Agent(name, hp, atk, def, speed, energy, doriki) {
+    // TODO: implement
 }
 
-int Lucci::specialSkill(Character *target, BattleContext &context)
-{
-    if (energy < 25) return 0;
-    energy = energy - 25;
-    int dmg = myDiv(atk * 280, 100);
-    int before = target->getHP();
-    int dealt = target->receiveDamageBypass(dmg, 50);
-    if (before > 0 && !target->isAlive())
-    {
-        context.morale = context.morale - 10;
-        valid(context);
+int Lucci::attack(Character* target, BattleContext& context) {
+    // TODO: implement
+    double dam=atk+ceil(doriki/20.0);
+    if(target->getHP() < 0.5 * target->getMaxHP()) dam=dam+ceil(dam*0.2);
+    target->receiveDamage((int)ceil(dam));
+    if(!target->isAlive()) {
+        defeated=true;
     }
-    return dealt;
+    return max(0, (int)(ceil(dam)) - target->getDef());
 }
 
-void Lucci::endTurn(BattleContext &context)
-{
-    if (hp < myDiv(maxHp * 40, 100))
-    {
-        atk = myDiv(atk * 105, 100);
+int Lucci::specialSkill(Character* target, BattleContext& context) {
+    // TODO: implement
+    if(this->energy<25) return 0;
+        this->energy-=25;
+        double dam=atk*2+ceil(0.8*atk)+floor(target->getDef()*0.5);
+        target->receiveDamage((int)ceil(dam));
+        if(!target->isAlive()) {
+            defeated=true;
+            context.morale-=10;
+        }
+    return max(0, (int)(ceil(dam)) - target->getDef());
+}
+
+void Lucci::endTurn(BattleContext& context) {
+    // TODO: implement
+    if(this->hp<0.4*this->maxHp) {
+        this->atk=atk+ceil(this->atk*0.05);
     }
+    defeated=false;
 }
 
 /*
  * Kaku
  */
-Kaku::Kaku(string name, int hp, int atk, int def, int speed, int energy, int doriki)
-    : CP9Agent(name, hp, atk, def, speed, energy, doriki) {}
-
-int Kaku::attack(Character *target, BattleContext &context)
-{
-    int before = target->getHP();
-    int dealt = target->receiveDamage(atk);
-    if (before > 0 && !target->isAlive())
-    {
-        context.morale = context.morale - 5;
-        valid(context);
-    }
-    return dealt;
+Kaku::Kaku(string name, int hp, int atk, int def,
+           int speed, int energy, int doriki) : CP9Agent(name, hp, atk, def, speed, energy, doriki) {
+    // TODO: implement
 }
 
-int Kaku::specialSkill(Character *target, BattleContext &context)
-{
-    if (energy < 20) return 0;
-    energy = energy - 20;
-    int total = 0;
-    int multipliers[3] = {120, 100, 80};
-    for (int idx = 0; idx < 3; idx++)
-    {
-        if (!target->isAlive()) break;
-        int dmg = myDiv(atk * multipliers[idx], 100);
-        int before = target->getHP();
-        int dealt = target->receiveDamage(dmg);
-        total = total + dealt;
-        if (before > 0 && !target->isAlive())
-        {
-            context.morale = context.morale - 5;
-            valid(context);
+int Kaku::attack(Character* target, BattleContext& context) {
+    // TODO: implement
+    double dam=atk;
+    target->receiveDamage((int)ceil(dam));
+    if(!target->isAlive()) {
+        defeated=true;
+    }
+    return max(0, (int)(ceil(dam)) - target->getDef());
+}
+
+int Kaku::specialSkill(Character* target, BattleContext& context) {
+    // TODO: implement
+    if(energy<20) return 0;
+    energy-=20;
+    double totalDam=0;
+    double damPer[]={1.2,1.0,0.8};
+    int count=0;
+    for(int i=0;i<3;i++) {
+        count++;
+        double dam=ceil(damPer[i]*atk);
+        totalDam+=dam;
+        target->receiveDamage((int)ceil(dam));
+        if(!target->isAlive()) {
+            defeated=true;
+            break;
         }
     }
-    return total;
+    return max(0, (int)(ceil(totalDam)) - count*target->getDef());
 }
 
-void Kaku::endTurn(BattleContext &context) {}
+void Kaku::endTurn(BattleContext& context) {
+    // TODO: implement
+    if(defeated) {
+        context.morale-=5;
+    }
+    defeated=false;
+}
 
 /*
  * Jabra
  */
-Jabra::Jabra(string name, int hp, int atk, int def, int speed, int energy, int doriki)
-    : CP9Agent(name, hp, atk, def, speed, energy, doriki) {}
-
-int Jabra::attack(Character *target, BattleContext &context)
-{
-    int before = target->getHP();
-    int dealt = target->receiveDamage(atk);
-    if (before > 0 && !target->isAlive())
-    {
-        context.morale = context.morale - 5;
-        valid(context);
-    }
-    return dealt;
+Jabra::Jabra(string name, int hp, int atk, int def,
+             int speed, int energy, int doriki) : CP9Agent(name, hp, atk, def, speed, energy, doriki) {
+    // TODO: implement
 }
 
-int Jabra::specialSkill(Character *target, BattleContext &context)
-{
-    if (energy < 18) return 0;
-    energy = energy - 18;
-    int dmg = myDiv(atk * 150, 100);
-    if (hp < myDiv(maxHp * 30, 100))
-    {
-        dmg = myDiv(dmg * 125, 100);
+int Jabra::attack(Character* target, BattleContext& context) {
+    // TODO: implement
+    target->receiveDamage((int)ceil(atk));
+    if(!target->isAlive()) {
+        this->defeated=true;
     }
-    int before = target->getHP();
-    int dealt = target->receiveDamage(dmg);
-    if (before > 0 && !target->isAlive())
-    {
-        context.morale = context.morale - 5;
-        valid(context);
-    }
-    return dealt;
+    return max(0, (int)(ceil(atk)) - target->getDef());
 }
 
-void Jabra::endTurn(BattleContext &context) {}
+int Jabra::specialSkill(Character* target, BattleContext& context) {
+    // TODO: implement
+    if(energy<18) return 0;
+    energy-=18;
+    double dam=atk+ceil(atk*0.5);
+    if(hp<0.35*maxHp) dam=dam+ceil(dam*0.25);
+    target->receiveDamage((int)ceil(dam));
+    if(!target->isAlive()) {
+        defeated=true;
+        context.morale-=5;
+    }
+    return max(0, (int)(ceil(dam)) - target->getDef());
+}
+
+void Jabra::endTurn(BattleContext& context) {
+    // TODO: implement
+    this->defeated=false;
+}
 
 /*
  * Blueno
  */
-Blueno::Blueno(string name, int hp, int atk, int def, int speed, int energy, int doriki)
-    : CP9Agent(name, hp, atk, def, speed, energy, doriki) {}
-
-int Blueno::attack(Character *target, BattleContext &context)
-{
-    int before = target->getHP();
-    int dealt = target->receiveDamage(atk);
-    if (before > 0 && !target->isAlive())
-    {
-        context.morale = context.morale - 5;
-        valid(context);
-    }
-    return dealt;
+Blueno::Blueno(string name, int hp, int atk, int def,
+               int speed, int energy, int doriki) : CP9Agent(name, hp, atk, def, speed, energy, doriki) {
+    // TODO: implement 
 }
 
-int Blueno::specialSkill(Character *target, BattleContext &context)
-{
-    if (energy < 15) return 0;
-    energy = energy - 15;
-    int dmg = myDiv(atk * 130, 100);
-    if (hp > maxHp * 50 / 100)
-    {
-        dmg = dmg + 20;
+int Blueno::attack(Character* target, BattleContext& context) {
+    // TODO: implement
+    target->receiveDamage((int)ceil(this->atk));
+    if(!target->isAlive()) {
+        this->defeated=true;
     }
-    else
-    {
-        dmg = dmg + 40;
-    }
-    int before = target->getHP();
-    int dealt = target->receiveDamage(dmg);
-    if (before > 0 && !target->isAlive())
-    {
-        context.morale = context.morale - 5;
-        valid(context);
-    }
-    return dealt;
+    return max(0, (int)(ceil(atk)) - target->getDef());
 }
 
-void Blueno::endTurn(BattleContext &context) {}
+int Blueno::specialSkill(Character* target, BattleContext& context) {
+    // TODO: implement
+    if(energy<15) return 0;
+    energy-=15;
+    double dam=atk+ceil(atk*0.3);
+    if(hp>0.5*maxHp) dam=dam+20;
+    else dam=dam+40;
+    target->receiveDamage((int)ceil(dam));
+    if(!target->isAlive()) {
+        defeated=true;
+    }
+    return max(0, (int)(ceil(dam)) - target->getDef());
+}
+
+void Blueno::endTurn(BattleContext& context) {
+    // TODO: implement
+    if(defeated) {
+        context.morale-=5;
+    }
+    defeated=false;
+}
 
 /*
  * Kalifa
  */
-Kalifa::Kalifa(string name, int hp, int atk, int def, int speed, int energy, int doriki)
-    : CP9Agent(name, hp, atk, def, speed, energy, doriki) {}
-
-int Kalifa::attack(Character *target, BattleContext &context)
-{
-    int before = target->getHP();
-    int dealt = target->receiveDamage(atk);
-    if (before > 0 && !target->isAlive())
-    {
-        context.morale = context.morale - 5;
-        valid(context);
-    }
-    return dealt;
+Kalifa::Kalifa(string name, int hp, int atk, int def,
+               int speed, int energy, int doriki) : CP9Agent(name, hp, atk, def, speed, energy, doriki) {
+    // TODO: implement
 }
 
-int Kalifa::specialSkill(Character *target, BattleContext &context)
-{
-    if (energy < 18) return 0;
-    energy = energy - 18;
-    int dmg = myDiv(atk * 140, 100);
-    int penalty = (target->getName() == "Nami") ? 12 : 8;
-    int before = target->getHP();
-    int dealt = target->receiveDamage(dmg);
-    if (before > 0 && !target->isAlive())
-    {
-        context.morale = context.morale - 5;
-        valid(context);
+int Kalifa::attack(Character* target, BattleContext& context) {
+    // TODO: implement
+    target->receiveDamage((int)ceil(atk));
+    if(!target->isAlive()) {
+        defeated=true;
+        context.morale-=5;
     }
-    target->reduceSpeed(6);
-    context.morale = context.morale - penalty;
-    valid(context);
-    return dealt;
+    return max(0, (int)(ceil(atk)) - target->getDef());
 }
 
-void Kalifa::endTurn(BattleContext &context) {}
+int Kalifa::specialSkill(Character* target, BattleContext& context) {
+    // TODO: implement
+    if(energy<18) return 0;
+    energy-=18;
+    double dam=atk+ceil(atk*0.4);
+    target->receiveDamage((int)ceil(dam));
+    if(!target->isAlive()) {
+        defeated=true;
+    }
+    if(target->getName()=="Nami"){
+        context.morale-=12;
+        target->setSpeed(target->getSpeed()-6);
+    }
+    else{
+        context.morale-=8;
+        target->setSpeed(target->getSpeed()-6);
+    }
+    return max(0, (int)(ceil(dam)) - target->getDef());
+}
+
+void Kalifa::endTurn(BattleContext& context) {
+    // TODO: implement
+    defeated=false;
+}
 
 /*
  * Kumadori
  */
-Kumadori::Kumadori(string name, int hp, int atk, int def, int speed, int energy, int doriki)
-    : CP9Agent(name, hp, atk, def, speed, energy, doriki) {}
-
-int Kumadori::attack(Character *target, BattleContext &context)
-{
-    int before = target->getHP();
-    int dealt = target->receiveDamage(atk);
-    if (before > 0 && !target->isAlive())
-    {
-        context.morale = context.morale - 5;
-        valid(context);
-    }
-    return dealt;
+Kumadori::Kumadori(string name, int hp, int atk, int def,
+                   int speed, int energy, int doriki) : CP9Agent(name, hp, atk, def, speed, energy, doriki) {
+    // TODO: implement
 }
 
-int Kumadori::specialSkill(Character *target, BattleContext &context)
-{
-    if (energy < 16) return 0;
-    energy = energy - 16;
-    int dmg = 30 + doriki / 10;
-    if (hp < myDiv(maxHp * 40, 100))
-    {
-        dmg = dmg + 25;
+int Kumadori::attack(Character* target, BattleContext& context) {
+    target->receiveDamage((int)ceil(atk));
+    if(!target->isAlive()) {
+        defeated=true;
     }
-    int before = target->getHP();
-    int dealt = target->receiveDamage(dmg);
-    if (before > 0 && !target->isAlive())
-    {
-        context.morale = context.morale - 5;
-        valid(context);
-    }
-    return dealt;
+    return max(0, (int)(ceil(atk)) - target->getDef());
 }
 
-void Kumadori::endTurn(BattleContext &context) {}
+int Kumadori::specialSkill(Character* target, BattleContext& context) {
+    // TODO: implement
+    if(energy<16) return 0;
+    energy-=16;
+    double dam=30+ceil(0.1*doriki);
+    if(hp<0.4*maxHp) dam=dam+25;
+    target->receiveDamage((int)ceil(dam));
+    if(!target->isAlive()) {
+        defeated=true;
+    }
+    return max(0, (int)(ceil(dam)) - target->getDef());
+}
+
+void Kumadori::endTurn(BattleContext& context) {
+    // TODO: implement
+    if(defeated) {
+        context.morale-=5;
+    }
+    defeated=false;
+}
 
 /*
  * Fukurou
  */
-Fukurou::Fukurou(string name, int hp, int atk, int def, int speed, int energy, int doriki)
-    : CP9Agent(name, hp, atk, def, speed, energy, doriki)
-{
-    isLowestTarget = false;
+Fukurou::Fukurou(string name, int hp, int atk, int def,
+                 int speed, int energy, int doriki) : CP9Agent(name, hp, atk, def, speed, energy, doriki) {
+    // TODO: implement
 }
 
-int Fukurou::attack(Character *target, BattleContext &context)
-{
-    int before = target->getHP();
-    int dealt = target->receiveDamage(atk);
-    if (before > 0 && !target->isAlive())
-    {
-        context.morale = context.morale - 5;
-        valid(context);
+int Fukurou::attack(Character* target, BattleContext& context) {
+    // TODO: implement
+    target->receiveDamage((int)ceil(atk));
+    if(!target->isAlive()) {
+        defeated=true;
     }
-    return dealt;
+    return max(0, (int)(ceil(atk)) - target->getDef());
 }
 
-int Fukurou::specialSkill(Character *target, BattleContext &context)
-{
-    if (energy < 14) return 0;
-    energy = energy - 14;
-    int dmg = myDiv(atk * 130, 100);
-    if (isLowestTarget)
-    {
-        dmg = dmg + 20;
+int Fukurou::specialSkill(Character* target, BattleContext& context) {
+    // TODO: implement
+    if(energy<14) return 0;
+    energy-=14;
+    double dam=atk+ceil(atk*0.3);
+    if(target->getHP()==context.low) dam=dam+20;
+    target->receiveDamage((int)ceil(dam));
+    if(!target->isAlive()) {
+        defeated=true;
+        context.morale-=6;
     }
-    int before = target->getHP();
-    int dealt = target->receiveDamage(dmg);
-    if (before > 0 && !target->isAlive())
-    {
-        context.morale = context.morale - 6;
-        valid(context);
-    }
-    return dealt;
+    return max(0, (int)(ceil(dam)) - target->getDef());
 }
 
-void Fukurou::endTurn(BattleContext &context) {}
+void Fukurou::endTurn(BattleContext& context) {
+    // TODO: implement
+    defeated=false;
+}
 
 /*
  * Building
  */
-Building::Building(string name, int hp)
-{
-    this->name = name;
-    this->hp = hp;
-    this->maxHP = hp;
-    this->destroyed = (hp <= 0);
-    this->onDestroyedDone = false;
+Building::Building(string name, int hp) {
+    // TODO: implement
+    this->name=name;
+    this->hp=(hp<0) ? 0 : hp;
+    this->maxHP=hp;
+    this->destroyed=(hp<=0)&&true;
 }
 
-Building::~Building() {}
-
-void Building::receiveDamage(int amount)
-{
-    hp = hp - amount;
-    if (hp <= 0)
-    {
-        hp = 0;
-        destroyed = true;
-    }
+Building::~Building() {
+    // TODO: implement if needed
 }
 
-void Building::forceDestroy()
-{
-    hp = 0;
-    destroyed = true;
+void Building::receiveDamage(int damage) {
+    // TODO: implement
+    hp=(hp - damage > 0) ? hp - damage : 0;
+    if(hp==0) destroyed=true;
 }
 
-bool Building::isDestroyed() const { return destroyed; }
+bool Building::isDestroyed() const {
+    // TODO: implement
+    return destroyed;
+}
 
-string Building::getName() const { return name; }
+void Building::onDestroyed(BattleContext& context) {
+    return ;
+}
 
-void Building::onDestroyed(BattleContext &context) {}
-
-string Building::str() const
-{
-    ostringstream out;
-    out << "Building[name=" << name << ",hp=" << hp << ",maxHP=" << maxHP
-        << ",destroyed=" << (destroyed ? "true" : "false") << "]";
-    return out.str();
+string Building::str () const {
+    // TODO: implement
+    return "Building[name=" + name + ", hp=" + to_string(hp) + ", maxHP=" + to_string(maxHP) + ", destroyed=" + to_string(destroyed) + "]";
 }
 
 /*
@@ -1042,16 +984,15 @@ string Building::str() const
  */
 MainGate::MainGate(string name, int hp) : Building(name, hp) {}
 
-void MainGate::applyEffect(BattleContext &context) {}
+void MainGate::applyEffect(BattleContext& context) {
+    // TODO: implement
+}
 
-void MainGate::onDestroyed(BattleContext &context)
-{
-    if (onDestroyedDone) return;
-    onDestroyedDone = true;
-    context.mainGateDestroyed = true;
-    context.rescueProgress += 20;
-    context.morale += 5;
-    valid(context);
+void MainGate::onDestroyed(BattleContext& context) {
+    // TODO: implement
+    context.mainGateDestroyed=true;
+    context.morale+=5;
+    context.rescueProgress+=20;
 }
 
 /*
@@ -1059,21 +1000,16 @@ void MainGate::onDestroyed(BattleContext &context)
  */
 Courthouse::Courthouse(string name, int hp) : Building(name, hp) {}
 
-void Courthouse::applyEffect(BattleContext &context)
-{
-    if (!destroyed)
-    {
-        context.alarmLevel = context.alarmLevel + 5;
-        valid(context);
-    }
+void Courthouse::applyEffect(BattleContext& context) {
+    // TODO: implement
+    if(destroyed) return;
+    context.alarmLevel+=5;
 }
 
-void Courthouse::onDestroyed(BattleContext &context)
-{
-    if (onDestroyedDone) return;
-    onDestroyedDone = true;
-    context.alarmLevel = context.alarmLevel - 20;
-    valid(context);
+void Courthouse::onDestroyed(BattleContext& context) {
+    // TODO: implement
+    context.alarmLevel-=20;
+    if(context.alarmLevel<0) context.alarmLevel=0;
 }
 
 /*
@@ -1081,18 +1017,15 @@ void Courthouse::onDestroyed(BattleContext &context)
  */
 TowerOfJustice::TowerOfJustice(string name, int hp) : Building(name, hp) {}
 
-void TowerOfJustice::applyEffect(BattleContext &context)
-{
-    if (context.mainGateDestroyed && !context.robinRescued)
-    {
-        context.rescueProgress = context.rescueProgress + 5;
-        valid(context);
-    }
-    if (context.rescueProgress >= 100)
-    {
-        context.robinRescued = true;
-        context.morale = context.morale + 10;
-        valid(context);
+void TowerOfJustice::applyEffect(BattleContext& context) {
+    // TODO: implement
+    if(context.mainGateDestroyed && !context.robinRescued){
+        context.rescueProgress += 5;
+        if (context.rescueProgress >= 100) {
+            context.rescueProgress = 100;
+            context.robinRescued = true;
+            context.morale += 10;
+        }
     }
 }
 
@@ -1101,19 +1034,17 @@ void TowerOfJustice::applyEffect(BattleContext &context)
  */
 BridgeOfHesitation::BridgeOfHesitation(string name, int hp) : Building(name, hp) {}
 
-void BridgeOfHesitation::applyEffect(BattleContext &context)
-{
-    if (context.robinRescued)
-    {
+void BridgeOfHesitation::applyEffect(BattleContext& context) {
+    // TODO: implement
+    if(destroyed) return;
+    if (context.robinRescued) {
         context.bridgeOpened = true;
         context.escapeProgress += 5;
-        valid(context);
-    }
-
-    if (context.escapeProgress >= 100)
-    {
-        context.battleEnded = true;
-        context.resultCode = "STRAW_HAT_WIN";
+        if (context.escapeProgress>=100) {
+            context.escapeProgress=100;
+            context.battleEnded=true;
+            context.resultCode="STRAW_HAT_WIN";
+        }
     }
 }
 
@@ -1122,524 +1053,333 @@ void BridgeOfHesitation::applyEffect(BattleContext &context)
  */
 BusterCallShip::BusterCallShip(string name, int hp) : Building(name, hp) {}
 
-void BusterCallShip::applyEffect(BattleContext &context)
-{
-    if (!destroyed)
-    {
-        context.busterCallTimer = context.busterCallTimer - 1;
-        if (context.busterCallTimer < 0) context.busterCallTimer = 0;
-        if (context.busterCallTimer <= 0)
-        {
-            context.battleEnded = true;
-            context.resultCode = "BUSTER_CALL";
+void BusterCallShip::applyEffect(BattleContext& context) {
+    // TODO: implement
+    if (!destroyed) {
+        context.busterCallTimer-=1;
+        if (context.busterCallTimer<=0){
+            context.busterCallTimer=0;
+            context.battleEnded=true;
+            context.resultCode="BUSTER_CALL";
         }
     }
 }
 
-void BusterCallShip::onDestroyed(BattleContext &context)
-{
-    if (onDestroyedDone) return;
-    onDestroyedDone = true;
-    context.busterCallTimer = context.busterCallTimer + 3;
+void BusterCallShip::onDestroyed(BattleContext& context) {
+    // TODO: implement
+    context.busterCallTimer+=3;
 }
 
 /*
  * EniesLobbyBattle
  */
-EniesLobbyBattle::EniesLobbyBattle(const string &filename)
-{
-    strawHats = new Character *[7];
-    cp9Agents = new Character *[7];
-    buildings = new Building *[5];
-    strawHatCount = 0;
-    cp9Count = 0;
-    buildingCount = 0;
-    turnOrder = nullptr;
-    maxTurns = 100;
+/*Lớp EniesLobbyBattle là lớp quản lý toàn bộ trận đánh tại Enies Lobby. Lớp này chịu trách
+nhiệm đọhouse dữ liệu khởi tạo, quản lý danh sách nhân vật, quản lý cáhouse công trình, điều phối lượt
+đánh, cập nhật trạng thái trong BattleContext và xáhouse định kết quả cuối cùng của trận chiến.
+Yêu cầu: Hiện thựhouse class EniesLobbyBattle với cáhouse mô tả sau:
+1. Cáhouse thuộhouse tính private:
+• strawHats: kiểu Character**, mảng động lưu cáhouse nhân vật thuộhouse băng Mũ Rơm.
+Số lượng nhân vật của băng Mũ Rơm không quá 7.
+• strawHatCount: kiểu int, số lượng nhân vật băng Mũ Rơm hiện có.
+• cp9Agents: kiểu Character**, mảng động lưu cáhouse đặhouse vụ CP9. Số lượng đặhouse vụ
+không quá 7.
+• cp9Count: kiểu int, số lượng đặhouse vụ CP9 hiện có.
+• buildings: kiểu Building**, mảng động lưu cáhouse công trình trên chiến trường. Số
+lượng công trình không quá 5.
+• buildingCount: kiểu int, số lượng công trình hiện có.
+• turnOrder: danh sách liên kết đơn quản lý thứ tự hành động của cáhouse nhân vật.
+• context: kiểu BattleContext, trạng thái hiện tại của trận đánh.
+• maxTurns: kiểu int, số lượt tối đa của trận đánh.*/
+EniesLobbyBattle::EniesLobbyBattle(const string& filename) {
+    // TODO: implement
+    strawHats= new Character*[7];
+    cp9Agents= new Character*[7];
+    buildings= new Building*[5];
+    strawHatCount=0;
+    cp9Count=0;
+    buildingCount=0;
     loadFromFile(filename);
+    tailNode=nullptr;
 }
 
-EniesLobbyBattle::~EniesLobbyBattle()
-{
-    for (int i = 0; i < strawHatCount; i++) delete strawHats[i];
-    for (int i = 0; i < cp9Count; i++) delete cp9Agents[i];
-    for (int i = 0; i < buildingCount; i++) delete buildings[i];
+EniesLobbyBattle::~EniesLobbyBattle() {
+    // TODO: implement
+    if (turnOrder) {
+        TurnNode* curr=turnOrder;
+        TurnNode* nextNode;
+        do {
+            nextNode=curr->next;
+            delete curr;
+            curr=nextNode;
+        } while (curr!=turnOrder);
+    }
+    for(int i=0; i < strawHatCount;i++) delete strawHats[i];
+    for(int i=0;i < cp9Count;i++) delete cp9Agents[i];
+    for(int i=0;i < buildingCount;i++) delete buildings[i];
     delete[] strawHats;
     delete[] cp9Agents;
     delete[] buildings;
-    TurnNode *current = turnOrder;
-    while (current)
-    {
-        TurnNode *nextNode = current->next;
-        delete current;
-        current = nextNode;
-    }
+
 }
 
-void EniesLobbyBattle::loadFromFile(const string &filename)
-{
-    ifstream input(filename);
+void EniesLobbyBattle::loadFromFile(const string& filename) {
+    // TODO: implement
+    ifstream f(filename);
+    if (!f.is_open()) return;
     string line;
-    while (getline(input, line))
-    {
+    while (getline(f, line)) {
         if (line.empty()) continue;
-        istringstream parser(line);
-        string tag;
-        parser >> tag;
-        if (tag == "CONTEXT")
-        {
-            int m, a, r, e, bt, mt;
-            parser >> m >> a >> r >> e >> bt >> mt;
-            context.morale = m;
-            context.alarmLevel = a;
-            context.rescueProgress = r;
-            context.escapeProgress = e;
-            context.busterCallTimer = bt;
-            maxTurns = mt;
+        stringstream s(line);
+        string str;
+        s>>str;
+        if(str=="CONTEXT"){
+            s>>context.morale>>context.alarmLevel>>context.rescueProgress>>context.escapeProgress>>context.busterCallTimer>>maxTurns;
         }
-        else if (tag == "STRAW_HAT")
-        {
-            string charName;
-            int hp, atk, def, spd, eng;
-            long long bountyVal;
-            parser >> charName >> hp >> atk >> def >> spd >> eng >> bountyVal;
-            Character *newChar = nullptr;
-            if (charName == "Luffy")
-                newChar = new Luffy(charName, hp, atk, def, spd, eng, bountyVal);
-            else if (charName == "Zoro")
-                newChar = new Zoro(charName, hp, atk, def, spd, eng, bountyVal);
-            else if (charName == "Sanji")
-                newChar = new Sanji(charName, hp, atk, def, spd, eng, bountyVal);
-            else if (charName == "Nami")
-                newChar = new Nami(charName, hp, atk, def, spd, eng, bountyVal);
-            else if (charName == "Chopper")
-                newChar = new Chopper(charName, hp, atk, def, spd, eng, bountyVal);
-            else if (charName == "Usopp")
-                newChar = new Usopp(charName, hp, atk, def, spd, eng, bountyVal);
-            else if (charName == "Franky")
-                newChar = new Franky(charName, hp, atk, def, spd, eng, bountyVal);
-            if (newChar) addStrawHat(newChar);
+        elif(str=="STRAW_HAT"){
+            string name;
+            int hp,atk,def,speed,energy;
+            long long bounty;
+            s>>name>>hp>>atk>>def>>speed>>energy>>bounty;
+            if(name=="Luffy") allocSH(new Luffy(name, hp, atk, def, speed, energy, bounty));
+            elif(name=="Zoro") allocSH(new Zoro(name, hp, atk, def, speed, energy, bounty));
+            elif(name=="Nami") allocSH(new Nami(name, hp, atk, def, speed, energy, bounty));
+            elif(name=="Usopp") allocSH(new Usopp(name, hp, atk, def, speed, energy, bounty));
+            elif(name=="Sanji") allocSH(new Sanji(name, hp, atk, def, speed, energy, bounty));
+            elif(name=="Chopper") allocSH(new Chopper(name, hp, atk, def, speed, energy, bounty));
+            elif(name=="Franky") allocSH(new Franky(name, hp, atk, def, speed, energy, bounty));
         }
-        else if (tag == "CP9")
-        {
-            string charName;
-            int hp, atk, def, spd, eng, dorikiVal;
-            parser >> charName >> hp >> atk >> def >> spd >> eng >> dorikiVal;
-            Character *newChar = nullptr;
-            if (charName == "Lucci")
-                newChar = new Lucci(charName, hp, atk, def, spd, eng, dorikiVal);
-            else if (charName == "Kaku")
-                newChar = new Kaku(charName, hp, atk, def, spd, eng, dorikiVal);
-            else if (charName == "Jabra")
-                newChar = new Jabra(charName, hp, atk, def, spd, eng, dorikiVal);
-            else if (charName == "Blueno")
-                newChar = new Blueno(charName, hp, atk, def, spd, eng, dorikiVal);
-            else if (charName == "Kalifa")
-                newChar = new Kalifa(charName, hp, atk, def, spd, eng, dorikiVal);
-            else if (charName == "Kumadori")
-                newChar = new Kumadori(charName, hp, atk, def, spd, eng, dorikiVal);
-            else if (charName == "Fukurou")
-                newChar = new Fukurou(charName, hp, atk, def, spd, eng, dorikiVal);
-            if (newChar) addCP9Agent(newChar);
+        elif(str=="CP9"){
+            string name;
+            int hp, atk, def, speed, energy, doriki;
+            s>>name>>hp>>atk>>def>>speed>>energy>>doriki;
+            if(name=="Lucci") addCP9Agent(new Lucci(name, hp, atk, def, speed, energy, doriki));
+            elif(name=="Kaku") addCP9Agent(new Kaku(name, hp, atk, def, speed, energy, doriki));
+            elif(name=="Jabra") addCP9Agent(new Jabra(name, hp, atk, def, speed, energy, doriki));
+            elif(name=="Blueno") addCP9Agent(new Blueno(name, hp, atk, def, speed, energy, doriki));
+            elif(name=="Kalifa") addCP9Agent(new Kalifa(name, hp, atk, def, speed, energy, doriki));
+            elif(name=="Kumadori") addCP9Agent(new Kumadori(name, hp, atk, def, speed, energy, doriki));
+            elif(name=="Fukurou") addCP9Agent(new Fukurou(name, hp, atk, def, speed, energy, doriki));
         }
-        else if (tag == "BUILDING")
-        {
-            string buildingName;
-            int hpVal;
-            parser >> buildingName >> hpVal;
-            Building *newBuilding = nullptr;
-            if (buildingName == "MainGate")
-                newBuilding = new MainGate(buildingName, hpVal);
-            else if (buildingName == "Courthouse")
-                newBuilding = new Courthouse(buildingName, hpVal);
-            else if (buildingName == "TowerOfJustice")
-                newBuilding = new TowerOfJustice(buildingName, hpVal);
-            else if (buildingName == "BridgeOfHesitation")
-                newBuilding = new BridgeOfHesitation(buildingName, hpVal);
-            else if (buildingName == "BusterCallShip")
-                newBuilding = new BusterCallShip(buildingName, hpVal);
-            if (newBuilding) addBuilding(newBuilding);
+        elif(str=="BUILDING"){
+            string name;
+            int hp;
+            s>>name>>hp;
+            if(name=="MainGate") addBuilding(new MainGate(name, hp));
+            elif(name=="Courthouse") addBuilding(new Courthouse(name, hp));
+            elif(name=="TowerOfJustice") addBuilding(new TowerOfJustice(name, hp));
+            elif(name=="BridgeOfHesitation") addBuilding(new BridgeOfHesitation(name, hp));
+            elif(name=="BusterCallShip") addBuilding(new BusterCallShip(name, hp));
         }
     }
+    f.close();
     buildTurnOrder();
 }
 
-void EniesLobbyBattle::addStrawHat(Character *character)
-{
-    if (strawHatCount < 7) strawHats[strawHatCount++] = character;
+void EniesLobbyBattle::allocSH(Character* character) {
+    // TODO: implement
+    if(strawHatCount<7) strawHats[strawHatCount++]=character;
 }
 
-void EniesLobbyBattle::addCP9Agent(Character *character)
-{
-    if (cp9Count < 7) cp9Agents[cp9Count++] = character;
+void EniesLobbyBattle::addCP9Agent(Character* character) {
+    // TODO: implement
+    if(cp9Count<7) cp9Agents[cp9Count++]=character;
 }
 
-void EniesLobbyBattle::addBuilding(Building *building)
-{
-    if (buildingCount < 5) buildings[buildingCount++] = building;
+void EniesLobbyBattle::addBuilding(Building* building) {
+    // TODO: implement
+    if(buildingCount<5) buildings[buildingCount++]=building;
 }
 
-void EniesLobbyBattle::buildTurnOrder()
-{
-    TurnNode *walker = turnOrder;
-    while (walker)
-    {
-        TurnNode *toDelete = walker;
-        walker = walker->next;
-        delete toDelete;
+void EniesLobbyBattle::buildTurnOrder() {
+    // TODO: implement
+    TurnNode* lastNode=nullptr;
+    turnOrder= new TurnNode(strawHats[0]);
+    lastNode=turnOrder;
+    for(int i=1;i<strawHatCount;i++){
+        lastNode->next=new TurnNode(strawHats[i]);
+        lastNode=lastNode->next;
     }
-    turnOrder = nullptr;
-    TurnNode *lastNode = nullptr;
-    for (int i = 0; i < strawHatCount; i++)
-    {
-        TurnNode *node = new TurnNode();
-        node->data = strawHats[i];
-        node->next = nullptr;
-        if (!turnOrder)
-        {
-            turnOrder = node;
-            lastNode = node;
+    for(int i=0;i<cp9Count;i++){
+        lastNode->next=new TurnNode(cp9Agents[i]);
+        lastNode=lastNode->next;
+    }
+    if(lastNode) lastNode->next=turnOrder;
+}
+
+void EniesLobbyBattle::runBattle() {
+    // TODO: implement
+    if(!turnOrder) return;
+    while (!context.battleEnded && context.turnCount<maxTurns){
+        if(turnOrder->data->isAlive()) {       
+        processTurn(turnOrder->data);
         }
-        else
-        {
-            lastNode->next = node;
-            lastNode = node;
-        }
-    }
-    for (int i = 0; i < cp9Count; i++)
-    {
-        TurnNode *node = new TurnNode();
-        node->data = cp9Agents[i];
-        node->next = nullptr;
-        if (!turnOrder)
-        {
-            turnOrder = node;
-            lastNode = node;
-        }
-        else
-        {
-            lastNode->next = node;
-            lastNode = node;
-        }
-    }
-}
-
-Building *EniesLobbyBattle::findBuilding(const string &targetName)
-{
-    for (int i = 0; i < buildingCount; i++)
-    {
-        if (buildings[i]->getName() == targetName) return buildings[i];
-    }
-    return nullptr;
-}
-
-Character *EniesLobbyBattle::firstAliveCP9()
-{
-    for (int i = 0; i < cp9Count; i++)
-    {
-        if (cp9Agents[i]->isAlive()) return cp9Agents[i];
-    }
-    return nullptr;
-}
-
-Character *EniesLobbyBattle::firstAliveStrawHat()
-{
-    for (int i = 0; i < strawHatCount; i++)
-    {
-        if (strawHats[i]->isAlive()) return strawHats[i];
-    }
-    return nullptr;
-}
-
-Character *EniesLobbyBattle::lowestHpStrawHat()
-{
-    Character *lowest = nullptr;
-    for (int i = 0; i < strawHatCount; i++)
-    {
-        if (strawHats[i]->isAlive())
-        {
-            if (!lowest || strawHats[i]->getHP() < lowest->getHP())
-            {
-                lowest = strawHats[i];
-            }
-        }
-    }
-    return lowest;
-}
-
-Character *EniesLobbyBattle::lowestHpStrawHatForCP9()
-{
-    return lowestHpStrawHat();
-}
-
-int EniesLobbyBattle::getSkillCost(Character *c)
-{
-    string id = c->getName();
-    if (id == "Luffy") return 20;
-    if (id == "Zoro") return 15;
-    if (id == "Sanji") return 18;
-    if (id == "Nami") return 20;
-    if (id == "Chopper") return 15;
-    if (id == "Usopp") return 16;
-    if (id == "Franky") return 20;
-    if (id == "Lucci") return 25;
-    if (id == "Kaku") return 20;
-    if (id == "Jabra") return 18;
-    if (id == "Blueno") return 15;
-    if (id == "Kalifa") return 18;
-    if (id == "Kumadori") return 16;
-    if (id == "Fukurou") return 14;
-    return 0;
-}
-
-void EniesLobbyBattle::runBattle()
-{
-    while (!context.battleEnded && context.turnCount < maxTurns)
-    {
-        if (!turnOrder) break;
-        TurnNode *current = turnOrder;
-Character *activeChar = current->data;
-
-if (activeChar->isAlive())
-{
-    processTurn(activeChar);
-}
-
-// rotate AFTER turn
-if (current->next)
-{
-    turnOrder = current->next;
-    current->next = nullptr;
-
-    TurnNode *tail = turnOrder;
-    while (tail->next)
-        tail = tail->next;
-
-    tail->next = current;
-}
+        turnOrder=turnOrder->next;
         processBuildings();
-
-context.nextTurn();
-checkEndCondition();
-
-if (context.battleEnded)
-    break;
-    }
-    if (!context.battleEnded)
-    {
-        context.battleEnded = true;
-        context.resultCode = "TIME_OUT";
+        context.turnCount++;
+        checkEndCondition();
     }
 }
 
-void EniesLobbyBattle::processTurn(Character *activeChar)
-{
-    if (!activeChar->isAlive()) return;
-if (activeChar->isStrawHat())
-{
-    Building *gate = findBuilding("MainGate");
-    Building *court = findBuilding("Courthouse");
-    Building *ship = findBuilding("BusterCallShip");
-    Building *bridge = findBuilding("BridgeOfHesitation");
-    int cost = getSkillCost(activeChar);
-    bool enoughEnergy = (activeChar->getEnergy() >= cost);
-    
-    bool gateBroken = (!gate || gate->isDestroyed());
-    bool courtBroken = (!court || court->isDestroyed());
-    bool shipBroken = (!ship || ship->isDestroyed());
-    
-    if (!gateBroken)
-{
-    bool wasBroken = gate->isDestroyed();
-
-    // Chopper không được heal cổng
-    if (activeChar->getName() == "Chopper")
-        activeChar->attack(gate, context);
-    else if (enoughEnergy)
-        activeChar->specialSkill(gate, context);
-    else
-        activeChar->attack(gate, context);
-
-    if (!wasBroken && gate->isDestroyed())
-    {
-        gate->onDestroyed(context);
-        valid(context);
-    }
-}
-    else if (gateBroken && context.alarmLevel >= 50 && !courtBroken)
-    {
-        bool wasBroken = court->isDestroyed();
-        if (enoughEnergy)
-            activeChar->specialSkill(court, context);
-        else
-            activeChar->attack(court, context);
-        if (!wasBroken && court->isDestroyed())
-        {
-            court->onDestroyed(context);
-            valid(context);
+void EniesLobbyBattle::processTurn(Character* character) {
+    // TODO: implement
+    if(!character->isAlive()) return;
+    Character* tarChar = nullptr;
+    Building* targetBuilding = nullptr;
+    if (character->isStrawHat()) {
+        bool chopperSpecial = false;
+        if (character->getName() == "Chopper" && character->getEnergy() >= 15) {
+            int minHp = INT_MAX;
+            for (int i = 0; i < strawHatCount; ++i) {
+                if (strawHats[i]->isAlive() && strawHats[i]->getHP() < minHp) {
+                    minHp = strawHats[i]->getHP();
+                    tarChar = strawHats[i];
+                }
+            }
+            if (tarChar) chopperSpecial = true;
+        }
+        if(!chopperSpecial){
+            Building *gate=nullptr,*house=nullptr,*ship=nullptr,*bridge=nullptr;
+            for(int i=0;i<buildingCount;i++){
+                if(buildings[i]->getName()=="MainGate") gate=buildings[i];
+                elif(buildings[i]->getName()=="Courthouse") house=buildings[i];
+                elif(buildings[i]->getName()=="BusterCallShip") ship=buildings[i];
+                elif(buildings[i]->getName()=="BridgeOfHesitation") bridge=buildings[i];
+            }
+            if(gate && !gate->isDestroyed() && !context.mainGateDestroyed) targetBuilding=gate;
+            elif(house && !house->isDestroyed() && context.alarmLevel>=50) targetBuilding=house;
+            elif(ship && !ship->isDestroyed() && context.busterCallTimer<=5) targetBuilding=ship;
+            elif(!context.robinRescued){
+                for(int i=0;i<cp9Count;i++){
+                    if(cp9Agents[i]->isAlive()) {
+                        tarChar=cp9Agents[i];
+                        break;
+                    }
+                }
+            }
+            else{
+                if(bridge && !bridge->isDestroyed() && context.robinRescued) targetBuilding=bridge;
+                else{
+                    for(int i=0;i<cp9Count;i++){
+                        if(cp9Agents[i]->isAlive()) {
+                            tarChar=cp9Agents[i];
+                            break;
+                        }
+                    }
+                }
         }
     }
-    else if (context.busterCallTimer <= 5 && !shipBroken)
-    {
-        bool wasBroken = ship->isDestroyed();
-        if (enoughEnergy)
-            activeChar->specialSkill(ship, context);
-        else
-            activeChar->attack(ship, context);
-        if (!wasBroken && ship->isDestroyed())
-        {
-            ship->onDestroyed(context);
-            valid(context);
-        }
+
     }
-    else if (!context.robinRescued)
-    {
-        
-        if (activeChar->getName() == "Chopper" && enoughEnergy)
-        {
-            Character *targetForHeal = lowestHpStrawHat();
-            if (targetForHeal)
-            {
-                activeChar->specialSkill(targetForHeal, context);
-                activeChar->endTurn(context);
-                valid(context);
-                return;
+    else {
+        for(int i=0;i<strawHatCount;i++){
+            if(strawHats[i]->isAlive()) {
+                tarChar=strawHats[i];
+                break;
             }
         }
-        
-        Character *enemy = firstAliveCP9();
-        if (enemy)
-        {
-            if (enoughEnergy)
-                activeChar->specialSkill(enemy, context);
-            else
-                activeChar->attack(enemy, context);
-            valid(context);
-        }
-    }
-    else
-    {
-        if (bridge && !bridge->isDestroyed())
-        {
-            bool wasBroken = bridge->isDestroyed();
-            if (enoughEnergy)
-                activeChar->specialSkill(bridge, context);
-            else
-                activeChar->attack(bridge, context);
-            if (!wasBroken && bridge->isDestroyed())
-            {
-                bridge->onDestroyed(context);
-                valid(context);
+        int minHp = INT_MAX;
+        for (int i = 0; i < strawHatCount; ++i) {
+            if (strawHats[i]->isAlive() && strawHats[i]->getHP() < minHp) {
+                minHp = strawHats[i]->getHP();
             }
         }
-        else
-        {
-            Character *enemy = firstAliveCP9();
-            if (enemy)
-            {
-                if (enoughEnergy)
-                    activeChar->specialSkill(enemy, context);
-                else
-                    activeChar->attack(enemy, context);
-                valid(context);
-            }
-        }
+        context.low = minHp;
     }
-}
-else if (activeChar->isCP9())
-{
-    Character *victim = firstAliveStrawHat();
-    if (!victim) return;
-    if (activeChar->getName() == "Fukurou")
-    {
-        Character *weakest = lowestHpStrawHat();
-        ((Fukurou *)activeChar)->isLowestTarget = (victim == weakest);
-    }
-    int cost = getSkillCost(activeChar);
-    if (activeChar->getEnergy() >= cost)
-    {
-        activeChar->specialSkill(victim, context);
-    }
-    else
-    {
-        activeChar->attack(victim, context);
-    }
-    valid(context);
-}
-activeChar->endTurn(context);
-valid(context);
-}
-
-void EniesLobbyBattle::processBuildings()
-{
-     for (int i = 0; i < buildingCount; i++)
-    {
-        if (!buildings[i]->isDestroyed())
-        {
-            buildings[i]->applyEffect(context);
-            valid(context);
-        }
-
-        if (context.battleEnded) return;
-    }
-}
-
-void EniesLobbyBattle::checkEndCondition()
-{
-    if (context.battleEnded) return;
-    if (context.robinRescued && context.escapeProgress >= 100)
-    {
-        context.battleEnded = true;
-        context.resultCode = "STRAW_HAT_WIN";
+    if (!tarChar && !targetBuilding) {
+        character->endTurn(context);
+        clamp();
         return;
     }
-    if (context.busterCallTimer <= 0)
-    {
-        context.battleEnded = true;
-        context.resultCode = "BUSTER_CALL";
+    bool special=false;
+    string n=character->getName();
+    int energy=character->getEnergy();
+    int hp=character->getHP();
+    int maxHp=character->getMaxHP();
+
+    if (n=="Luffy" && energy>=20 && hp>=ceil(maxHp*0.15)) special=true;
+    elif (n=="Zoro" && energy>=15) special=true;
+    elif (n=="Sanji" && energy>=18) special=true;
+    elif (n=="Nami" && energy>=20) special=true;
+    elif (n=="Chopper" && energy>=15) special=true;
+    elif (n=="Usopp" && energy>=16) special=true;
+    elif (n=="Franky" && energy>=20) special=true;
+    elif (n=="Lucci" && energy>=25) special=true;
+    elif (n=="Kaku" && energy>=20) special=true;
+    elif (n=="Jabra" && energy>=18) special=true;
+    elif (n=="Blueno" && energy>=15) special=true;
+    elif (n=="Kalifa" && energy>=18) special=true;
+    elif (n=="Kumadori" && energy>=16) special=true;
+    elif (n=="Fukurou" && energy>=14) special=true;
+
+    if (tarChar) {
+        if (special) character->specialSkill(tarChar, context);
+        else character->attack(tarChar, context);
+    } elif (targetBuilding) {
+        bool wasDest = targetBuilding->isDestroyed();
+        if (special) character->specialSkill(targetBuilding, context);
+        else character->attack(targetBuilding, context);
+        
+        if (!wasDest && targetBuilding->isDestroyed()) {
+            targetBuilding->onDestroyed(context);
+            
+        }
+    }
+    character->endTurn(context);
+    clamp();
+}
+void EniesLobbyBattle::processBuildings() {
+    // TODO: implement
+    for(int i=0;i < buildingCount;i++){
+        buildings[i]->applyEffect(context);
+    }
+}
+
+void EniesLobbyBattle::checkEndCondition() {
+    // TODO: implement
+    if (context.robinRescued && context.escapeProgress>=100) {
+        context.battleEnded=true;
+        context.resultCode="STRAW_HAT_WIN";
         return;
     }
-    bool allSHDead = true;
-    for (int i = 0; i < strawHatCount; i++)
-    {
-        if (strawHats[i]->isAlive())
-        {
-            allSHDead = false;
+    if (context.busterCallTimer<= 0) {
+        context.battleEnded=true;
+        context.resultCode="BUSTER_CALL";
+        return;
+    }
+    
+    bool strawHatsAlive=false;
+    for (int i=0; i<strawHatCount; i++) {
+        if (strawHats[i]->isAlive()) {
+            strawHatsAlive=true;
             break;
         }
     }
-    if (allSHDead)
-    {
-        context.battleEnded = true;
-        context.resultCode = "CP9_WIN";
+    if (!strawHatsAlive) {
+        context.battleEnded=true;
+        context.resultCode="CP9_WIN";
         return;
     }
-    bool allCP9Dead = true;
-    for (int i = 0; i < cp9Count; i++)
-    {
-        if (cp9Agents[i]->isAlive())
-        {
-            allCP9Dead = false;
+    
+    bool cp9Alive = false;
+    for (int i=0; i<cp9Count; i++) {
+        if (cp9Agents[i]->isAlive()) {
+            cp9Alive=true;
             break;
         }
     }
-    if (allCP9Dead)
-    {
-        context.battleEnded = true;
-        context.resultCode = "STRAW_HAT_WIN_BY_DEFEAT_CP9";
+    if (!cp9Alive) {
+        context.battleEnded=true;
+        context.resultCode="STRAW_HAT_WIN_BY_DEFEAT_CP9";
         return;
     }
-    if (context.turnCount >= maxTurns)
-    {
-        context.battleEnded = true;
-        context.resultCode = "TIME_OUT";
+    if (context.turnCount>=maxTurns) {
+        context.battleEnded=true;
+        context.resultCode="TIME_OUT";
         return;
     }
+}
+string EniesLobbyBattle::getResult() const {
+    // TODO: implement
+    return context.resultCode + " " + to_string(context.turnCount) + " " + to_string(context.morale) + " " + to_string(context.alarmLevel) + " " +to_string(context.rescueProgress) + " " + to_string(context.escapeProgress) + " " + to_string(context.busterCallTimer);
 }
 
-string EniesLobbyBattle::getResult() const
-{
-    ostringstream output;
-    output << context.resultCode << " " << context.turnCount << " "<< context.morale << " " << context.alarmLevel << " "<< context.rescueProgress << " " << context.escapeProgress << " "<< context.busterCallTimer;
-    return output.str();
-}
