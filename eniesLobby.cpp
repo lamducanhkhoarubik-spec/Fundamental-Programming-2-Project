@@ -619,39 +619,41 @@ int Franky::specialSkill(Character *target, BattleContext &context)
 {
     if (energy >= 30)
     {
+        // Coup de Vent (30 energy)
         energy -= 30;
-    int dmg = myDiv(atk * 180, 100);
-
-    if (target->getName() == "Lucci")
-        dmg = myDiv(dmg * 120, 100);
-
-    target->reduceSpeed(8);
+        int dmg = myDiv(atk * 120, 100);  // 120% atk
+        
         int before = target->getHP();
         int dealt = target->receiveDamage(dmg);
         if (before > 0 && !target->isAlive())
         {
-            context.morale = context.morale + 5;
+            context.morale += 5;
             valid(context);
         }
         return dealt;
     }
     else if (energy >= 20)
     {
-        energy = energy - 20;
-        int dmg = myDiv(atk * 180, 100);
+        // Strong Right (20 energy)
+        energy -= 20;
+        int dmg = myDiv(atk * 180, 100);  // 180% atk
+        
+        if (target->getName() == "Lucci")
+            dmg = myDiv(dmg * 120, 100);  // +20% vs Lucci
+        
+        target->reduceSpeed(8);
         
         int before = target->getHP();
         int dealt = target->receiveDamage(dmg);
         if (before > 0 && !target->isAlive())
         {
-            context.morale = context.morale + 5;
+            context.morale += 5;
             valid(context);
         }
         return dealt;
     }
     return 0;
 }
-
 int Franky::attack(Building *target, BattleContext &context)
 {
     int dmg = atk + myDiv(def * 30, 100);
@@ -1379,7 +1381,7 @@ int EniesLobbyBattle::getSkillCost(Character *c)
     if (id == "Nami") return 20;
     if (id == "Chopper") return 15;
     if (id == "Usopp") return 16;
-    if (id == "Franky") return 30;
+    if (id == "Franky") return 20;
     if (id == "Lucci") return 25;
     if (id == "Kaku") return 20;
     if (id == "Jabra") return 18;
