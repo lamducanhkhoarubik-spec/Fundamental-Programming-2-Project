@@ -4,40 +4,37 @@ project(EniesLobbyBattleSystem LANGUAGES CXX)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-# Bật tính năng tạo testcase của CMake
+# Enable CMake's built-in testing functionality (CTest)
 enable_testing()
 
-# Tạo file thực thi chính từ main.cpp và các file source của bạn
-# Sửa lại danh sách file .cpp thực tế của bạn ở đây nếu có thêm file khác nhé
+# Create the main executable from main.cpp and your source files
+# Update the source file list here if you add any extra .cpp files later
 add_executable(eniesLobby_bin main.cpp eniesLobby.cpp)
 
 # ----------------------------------------------------------------
-# ĐOẠN CODE QUÉT VÀ CHẠY TESTCASE TỰ ĐỘNG:
+# AUTOMATIC TESTCASE DISCOVERY AND CONFIGURATION:
 # ----------------------------------------------------------------
 
-# 1. Tìm tất cả các file .txt trong thư mục testcase/
-# Sửa từ *.txt thành input_*.txt để chỉ lọc các file test thực sự
-# ... (Giữ nguyên phần đầu cho đến đoạn file(GLOB...))
-
-# Tìm các file input_*.txt trong thư mục testcase/
+# Find all input_*.txt files inside the testcase/ directory
 file(GLOB TEST_FILES "${CMAKE_CURRENT_SOURCE_DIR}/testcase/input_*.txt")
 
-# Cấu hình số điểm cho mỗi testcase (ví dụ: 3.33 điểm/câu, hoặc 3 điểm/câu)
+# Define the score allocated per testcase (e.g., 3.0 points per test)
 set(DIEM_MOI_CAU "3.0")
 
 foreach(FILE_PATH ${TEST_FILES})
+    # Extract the file name from the absolute file path
     get_filename_component(FILE_NAME ${FILE_PATH} NAME)
     
-    # Đặt tên testcase hiển thị
+    # Define a clean display name for the testcase
     set(TEST_NAME "Test_${FILE_NAME}")
     
-    # 1. Đăng ký testcase
+    # 1. Register the testcase with the executable and its corresponding input argument
     add_test(NAME ${TEST_NAME} COMMAND eniesLobby_bin "${FILE_PATH}")
     
-    # 2. LÀM ĐẸP & TÍNH ĐIỂM: Gắn nhãn điểm số và format vào testcase
+    # 2. Assign labels and environment meta-data for scoring/filtering
     set_tests_properties(${TEST_NAME} PROPERTIES
         LABELS "EniesLobby_Assignment"
-        # Định dạng môi trường giả lập để CTest gom nhóm đẹp hơn
+        # Set environment variable to make the test score accessible within CTest
         ENVIRONMENT "TEST_SCORE=${DIEM_MOI_CAU}"
     )
 endforeach()

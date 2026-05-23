@@ -224,12 +224,12 @@ int Luffy::attack(Character* target, BattleContext& context) {
     // TODO: implement
     this->attacked=true;
     double percent=this->hp*1.0/maxHp;
-    double dam=0;
-    if(percent>=0.5) dam=atk;
-    elif(percent>=0.3) dam=ceil(this->atk*1.15);
-    else dam=ceil(atk*1.3);
-    target->receiveDamage((int)ceil(dam));
-    int actualDam= (int)ceil(dam) - target->getDef();
+    double damage=0;
+    if(percent>=0.5) damage=atk;
+    elif(percent>=0.3) damage=ceil(this->atk*1.15);
+    else damage=ceil(atk*1.3);
+    target->receiveDamage((int)ceil(damage));
+    int actualDam= (int)ceil(damage) - target->getDef();
     if(!target->isAlive()) {
         this->defeated=true;
         context.morale+=5;
@@ -242,12 +242,12 @@ int Luffy::specialSkill(Character* target, BattleContext& context) {
     this->attacked=true;
     if(this->energy<20 || this->hp*1.0<this->maxHp*0.15) return 0;
     this->energy-=20;
-    int dam=ceil(this->atk*2);
+    int damage=ceil(this->atk*2);
     this->speed+=15;
     this->atk+=15;
-    int actualDam= (int)ceil(dam) - target->getDef();
+    int actualDam= (int)ceil(damage) - target->getDef();
     this->hp-= (int)ceil(0.08*maxHp);
-    target->receiveDamage((int)ceil(dam));
+    target->receiveDamage((int)ceil(damage));
         if(!target->isAlive()) {
         defeated=true;
     }
@@ -257,25 +257,25 @@ int Luffy::specialSkill(Character* target, BattleContext& context) {
 
 int Luffy::attack(Building* target, BattleContext& context) {
     double percent=this->hp*1.0/this->maxHp;
-    double dam=0;
-    if(percent>=0.5) dam=atk;
-    elif(percent>=0.3) dam=ceil(atk*1.15);
-    else dam=ceil(atk*1.3);
-    target->receiveDamage((int)ceil(dam));
-    return max(0,(int)ceil(dam));
+    double damage=0;
+    if(percent>=0.5) damage=atk;
+    elif(percent>=0.3) damage=ceil(atk*1.15);
+    else damage=ceil(atk*1.3);
+    target->receiveDamage((int)ceil(damage));
+    return max(0,(int)ceil(damage));
 }
 
 int Luffy::specialSkill(Building* target, BattleContext& context) {
     this->attacked=true;
     if(this->energy<20 || this->hp*1.0<this->maxHp*0.15) return 0;
     this->energy-=20;
-    int dam=ceil(this->atk*2);
+    int damage=ceil(this->atk*2);
     this->speed+=15;
     this->atk+=15;
     this->hp=this->hp - (int)ceil(0.08*maxHp);
     context.alarmLevel+=10;
-    target->receiveDamage((int)ceil(dam));
-    return max(0,(int)(ceil(dam)));
+    target->receiveDamage((int)ceil(damage));
+    return max(0,(int)(ceil(damage)));
 }
 
 void Luffy::endTurn(BattleContext& context) {
@@ -293,10 +293,10 @@ Zoro::Zoro(string name, int hp, int atk, int def, int speed, int energy, long lo
 }
 
 int Zoro::attack(Character* target, BattleContext& context) {
-    double dam=this->atk+ceil(0.2*this->def);
-    if(target->getHP()<0.4*this->maxHp) dam=ceil(dam*1.15);
-    target->receiveDamage((int)ceil(dam));
-    int actualDam= (int)ceil(dam) - target->getDef();
+    double damage=this->atk+ceil(0.2*this->def);
+    if(target->getHP()<0.4*this->maxHp) damage=ceil(damage*1.15);
+    target->receiveDamage((int)ceil(damage));
+    int actualDam= (int)ceil(damage) - target->getDef();
     if(!target->isAlive()) {
         this->defeated=true;
     }
@@ -308,10 +308,10 @@ int Zoro::specialSkill(Character* target, BattleContext& context) {
     // TODO: implement
     if(this->energy<15) return 0;
     this->energy-=15;
-    double dam=ceil(2.2*atk);
-    if(target->getHP()<0.5*maxHp) dam=ceil(dam*1.5);
-    target->receiveDamage((int)ceil(dam));
-    int actualDam= (int)ceil(dam) - target->getDef();
+    double damage=ceil(2.2*atk);
+    if(target->getHP()<0.5*maxHp) damage=ceil(damage*1.5);
+    target->receiveDamage((int)ceil(damage));
+    int actualDam= (int)ceil(damage) - target->getDef();
     if(!target->isAlive()) {
         this->defeated=true;
         context.morale+=4;
@@ -322,20 +322,20 @@ int Zoro::specialSkill(Character* target, BattleContext& context) {
 
 int Zoro::attack(Building* target, BattleContext& context) {
     // TODO: implement
-    double dam=this->atk+ceil(0.2*this->def);
-    if(target->getHp()<0.4*target->getMaxHP()) dam=ceil(dam*1.15);
-    target->receiveDamage((int)ceil(dam));
-    return max(0,(int)ceil(dam));
+    double damage=this->atk+ceil(0.2*this->def);
+    if(target->getHp()<0.4*target->getMaxHP()) damage=ceil(damage*1.15);
+    target->receiveDamage((int)ceil(damage));
+    return max(0,(int)ceil(damage));
 }
 
 int Zoro::specialSkill(Building* target, BattleContext& context) {
     // TODO: implement
         if(this->energy<15) return 0;
     this->energy-=15;
-    double dam = ceil(2.2*this->atk);
-    if(target->getHp()<0.5*target->getMaxHP()) dam=ceil(dam*1.5);
-    target->receiveDamage((int)ceil(dam));
-    return max(0,(int)ceil(dam));
+    double damage = ceil(2.2*this->atk);
+    if(target->getHp()<0.5*target->getMaxHP()) damage=ceil(damage*1.5);
+    target->receiveDamage((int)ceil(damage));
+    return max(0,(int)ceil(damage));
 }
 
 void Zoro::endTurn(BattleContext& context) {
@@ -357,10 +357,10 @@ Sanji::Sanji(string name, int hp, int atk, int def,
 
 int Sanji::attack(Character* target, BattleContext& context) {
     // TODO: implement
-    double dam=this->atk+ceil(0.5*this->speed);
-    if(this->def > target->getDef()) dam=ceil(dam*1.1);
-    target->receiveDamage((int)ceil(dam));
-    int actualDam= (int)ceil(dam) - target->getDef();
+    double damage=this->atk+ceil(0.5*this->speed);
+    if(this->def > target->getDef()) damage=ceil(damage*1.1);
+    target->receiveDamage((int)ceil(damage));
+    int actualDam= (int)ceil(damage) - target->getDef();
     if(!target->isAlive()) {
         this->defeated=true;
     }
@@ -371,9 +371,9 @@ int Sanji::specialSkill(Character* target, BattleContext& context) {
     // TODO: implement
     if(this->energy<18) return 0;
     this->energy-=18;
-    double dam=ceil(2.1*atk);
-    target->receiveDamage((int)ceil(dam));
-    int actualDam= (int)ceil(dam) - target->getDef();
+    double damage=ceil(2.1*atk);
+    target->receiveDamage((int)ceil(damage));
+    int actualDam= (int)ceil(damage) - target->getDef();
     if(target->getName()=="Jabra") target->setDef(target->getDef()-12);
     else target->setDef(target->getDef()-8);
     if(!target->isAlive()) {
@@ -384,17 +384,17 @@ int Sanji::specialSkill(Character* target, BattleContext& context) {
 
 int Sanji::attack(Building* target, BattleContext& context) {
     // TODO: implement
-    double dam=atk+ceil(0.5*speed);
-    target->receiveDamage((int)ceil(dam));
-    return max(0,(int)ceil(dam));
+    double damage=atk+ceil(0.5*speed);
+    target->receiveDamage((int)ceil(damage));
+    return max(0,(int)ceil(damage));
 }
 
 int Sanji::specialSkill(Building* target, BattleContext& context) {
     if(energy<18) return 0;
     energy-=18;
-    double dam=ceil(2.1*atk);
-    target->receiveDamage((int)ceil(dam));
-    return max(0,(int)ceil(dam));
+    double damage=ceil(2.1*atk);
+    target->receiveDamage((int)ceil(damage));
+    return max(0,(int)ceil(damage));
 }
 
 void Sanji::endTurn(BattleContext& context) {
@@ -417,9 +417,9 @@ Nami::Nami(string name, int hp, int atk, int def,
 
 int Nami::attack(Character* target, BattleContext& context) {
     // TODO: implement
-    double dam=this->atk+floor(0.3*target->getDef());
-    target->receiveDamage((int)ceil(dam));
-    int actualDam= (int)ceil(dam) - target->getDef();
+    double damage=this->atk+floor(0.3*target->getDef());
+    target->receiveDamage((int)ceil(damage));
+    int actualDam= (int)ceil(damage) - target->getDef();
     if(!target->isAlive()) {
         this->defeated=true;
     }
@@ -430,10 +430,10 @@ int Nami::specialSkill(Character* target, BattleContext& context) {
     // TODO: implement
     if(this->energy<20) return 0;
     this->energy-=20;
-    double dam=this->atk+40;
-    target->receiveDamage((int)ceil(dam));
+    double damage=this->atk+40;
+    target->receiveDamage((int)ceil(damage));
     target->setSpeed(target->getSpeed()-10);
-    int actualDam= (int)ceil(dam) - target->getDef();
+    int actualDam= (int)ceil(damage) - target->getDef();
     if(!target->isAlive()) {
         this->defeated=true;
     }
@@ -444,20 +444,20 @@ int Nami::specialSkill(Character* target, BattleContext& context) {
 
 int Nami::attack(Building* target, BattleContext& context) {
     // TODO: implement
-    double dam=ceil(atk*0.5);
-    target->receiveDamage((int)ceil(dam));
-    return max(0,(int)ceil(dam));
+    double damage=ceil(atk*0.5);
+    target->receiveDamage((int)ceil(damage));
+    return max(0,(int)ceil(damage));
 }
 
 int Nami::specialSkill(Building* target, BattleContext& context) {
     // TODO: implement
     if(this->energy<20) return 0;
     this->energy-=20;
-    double dam=(this->atk+40)+ceil((this->atk+40)*0.5);
-    target->receiveDamage((int)ceil(dam));
+    double damage=(this->atk+40)+ceil((this->atk+40)*0.5);
+    target->receiveDamage((int)ceil(damage));
     context.busterCallTimer++;
     context.alarmLevel-=5;
-    return max(0,(int)ceil(dam));
+    return max(0,(int)ceil(damage));
 }
 
 void Nami::endTurn(BattleContext& context) {
@@ -479,9 +479,9 @@ Chopper::Chopper(string name, int hp, int atk, int def,
 
 int Chopper::attack(Character* target, BattleContext& context) {
     // TODO: implement
-        double dam=atk;
-        target->receiveDamage((int)ceil(dam));
-        int actualDam= (int)ceil(dam) - target->getDef();
+        double damage=atk;
+        target->receiveDamage((int)ceil(damage));
+        int actualDam= (int)ceil(damage) - target->getDef();
         if(!target->isAlive()) {
             defeated=true;
         }
@@ -503,9 +503,9 @@ int Chopper::specialSkill(Character* target, BattleContext& context) {
 
 int Chopper::attack(Building* target, BattleContext& context) {
     // TODO: implement
-            double dam=atk ;
-            target->receiveDamage((int)ceil(dam));
-    return max(0,(int)ceil(dam));
+            double damage=atk ;
+            target->receiveDamage((int)ceil(damage));
+    return max(0,(int)ceil(damage));
 }
 
 void Chopper::endTurn(BattleContext& context) {
@@ -526,13 +526,13 @@ Usopp::Usopp(string name, int hp, int atk, int def,
 
 int Usopp::attack(Character* target, BattleContext& context) {
     // TODO: implement
-        double dam=atk;
-        if(target->getSpeed()<50) dam=ceil(dam*1.2);
-        target->receiveDamage((int)ceil(dam));
+        double damage=atk;
+        if(target->getSpeed()<50) damage=ceil(damage*1.2);
+        target->receiveDamage((int)ceil(damage));
         if(!target->isAlive()) {
             defeated=true;
         }
-    int actualDam= (int)ceil(dam) - target->getDef();
+    int actualDam= (int)ceil(damage) - target->getDef();
     return max(0,actualDam);
 }
 
@@ -540,31 +540,31 @@ int Usopp::specialSkill(Character* target, BattleContext& context) {
     // TODO: implement
     if(energy<16) return 0;
     energy-=16;
-    double dam=ceil(atk*0.8);
+    double damage=ceil(atk*0.8);
     target->setSpeed((int)(target->getSpeed()-12));
-    target->receiveDamage((int)ceil(dam));
+    target->receiveDamage((int)ceil(damage));
     if(!target->isAlive()) {
         defeated=true;
     }
     context.escapeProgress+=8;
-    int actualDam= (int)ceil(dam) - target->getDef();
+    int actualDam= (int)ceil(damage) - target->getDef();
     return max(0,actualDam);
 }
 
 int Usopp::attack(Building* target, BattleContext& context) {
     // TODO: implement
-            double dam=atk*0.5;
-        target->receiveDamage((int)ceil(dam));
-    return max(0,(int)ceil(dam));
+            double damage=atk*0.5;
+        target->receiveDamage((int)ceil(damage));
+    return max(0,(int)ceil(damage));
 }
 
 int Usopp::specialSkill(Building* target, BattleContext& context) {
     if(energy<16) return 0;
     energy-=16;
-    double dam=ceil(atk*0.8);
-    target->receiveDamage((int)ceil(dam));
+    double damage=ceil(atk*0.8);
+    target->receiveDamage((int)ceil(damage));
     context.escapeProgress+=8;
-    return max(0,(int)ceil(dam));
+    return max(0,(int)ceil(damage));
 }
 
 void Usopp::endTurn(BattleContext& context) {
@@ -583,13 +583,13 @@ Franky::Franky(string name, int hp, int atk, int def,
 
 int Franky::attack(Character* target, BattleContext& context) {
     // TODO: implement
-        double dam=this->atk+ceil(0.3*this->def);
-        if(target->isCP9()) dam=dam+ceil(dam*0.1);
-            target->receiveDamage((int)ceil(dam));
+        double damage=this->atk+ceil(0.3*this->def);
+        if(target->isCP9()) damage=damage+ceil(damage*0.1);
+            target->receiveDamage((int)ceil(damage));
             if(!target->isAlive()) {
                 this->defeated=true;
             }
-    int actualDam= (int)ceil(dam) - target->getDef();
+    int actualDam= (int)ceil(damage) - target->getDef();
     return max(0,actualDam);
 }
 
@@ -598,37 +598,37 @@ int Franky::specialSkill(Character* target, BattleContext& context) {
     if(energy<20) return 0;
     if(energy<30){
     energy-=20;
-    double dam=atk+ceil(0.8*atk);
-    if(target->getName()=="Lucci") dam=dam+ceil(dam*0.2);
-    target->receiveDamage((int)ceil(dam));
+    double damage=atk+ceil(0.8*atk);
+    if(target->getName()=="Lucci") damage=damage+ceil(damage*0.2);
+    target->receiveDamage((int)ceil(damage));
     if(!target->isAlive()) {
         defeated=true;
     }
     target->setSpeed((int)(target->getSpeed()-8));
-    return max(0,(int)(ceil(dam))-target->getDef());
+    return max(0,(int)(ceil(damage))-target->getDef());
     }
     energy-=30;
-    double dam=atk+ceil(0.2*atk);
-    target->receiveDamage((int)ceil(dam));
+    double damage=atk+ceil(0.2*atk);
+    target->receiveDamage((int)ceil(damage));
     if(!target->isAlive()) {
         defeated=true;
     }
-    return max(0,(int)(ceil(dam))-target->getDef());
+    return max(0,(int)(ceil(damage))-target->getDef());
 }
 
 int Franky::attack(Building* target, BattleContext& context) {
-            double dam=atk+ceil(0.3*def);
-            target->receiveDamage((int)ceil(dam));
-            return max(0,(int)(ceil(dam)));
+            double damage=atk+ceil(0.3*def);
+            target->receiveDamage((int)ceil(damage));
+            return max(0,(int)(ceil(damage)));
 }
 
 int Franky::specialSkill(Building* target, BattleContext& context) {
     if(energy<20) return 0;
     if(energy<30){
     energy-=20;
-    double dam=atk+ceil(0.8*atk);
-    target->receiveDamage((int)ceil(dam));
-    return max(0,(int)(ceil(dam)));
+    double damage=atk+ceil(0.8*atk);
+    target->receiveDamage((int)ceil(damage));
+    return max(0,(int)(ceil(damage)));
     }
     energy-=30;
     target->receiveDamage(target->getHp());
@@ -677,26 +677,26 @@ Lucci::Lucci(string name, int hp, int atk, int def,
 
 int Lucci::attack(Character* target, BattleContext& context) {
     // TODO: implement
-    double dam=atk+ceil(doriki/20.0);
-    if(target->getHP() < 0.5 * target->getMaxHP()) dam=dam+ceil(dam*0.2);
-    target->receiveDamage((int)ceil(dam));
+    double damage=atk+ceil(doriki/20.0);
+    if(target->getHP() < 0.5 * target->getMaxHP()) damage=damage+ceil(damage*0.2);
+    target->receiveDamage((int)ceil(damage));
     if(!target->isAlive()) {
         defeated=true;
     }
-    return max(0, (int)(ceil(dam)) - target->getDef());
+    return max(0, (int)(ceil(damage)) - target->getDef());
 }
 
 int Lucci::specialSkill(Character* target, BattleContext& context) {
     // TODO: implement
     if(this->energy<25) return 0;
         this->energy-=25;
-        double dam=atk*2+ceil(0.8*atk)+floor(target->getDef()*0.5);
-        target->receiveDamage((int)ceil(dam));
+        double damage=atk*2+ceil(0.8*atk)+floor(target->getDef()*0.5);
+        target->receiveDamage((int)ceil(damage));
         if(!target->isAlive()) {
             defeated=true;
             context.morale-=10;
         }
-    return max(0, (int)(ceil(dam)) - target->getDef());
+    return max(0, (int)(ceil(damage)) - target->getDef());
 }
 
 void Lucci::endTurn(BattleContext& context) {
@@ -717,12 +717,12 @@ Kaku::Kaku(string name, int hp, int atk, int def,
 
 int Kaku::attack(Character* target, BattleContext& context) {
     // TODO: implement
-    double dam=atk;
-    target->receiveDamage((int)ceil(dam));
+    double damage=atk;
+    target->receiveDamage((int)ceil(damage));
     if(!target->isAlive()) {
         defeated=true;
     }
-    return max(0, (int)(ceil(dam)) - target->getDef());
+    return max(0, (int)(ceil(damage)) - target->getDef());
 }
 
 int Kaku::specialSkill(Character* target, BattleContext& context) {
@@ -734,9 +734,9 @@ int Kaku::specialSkill(Character* target, BattleContext& context) {
     int count=0;
     for(int i=0;i<3;i++) {
         count++;
-        double dam=ceil(damPer[i]*atk);
-        totalDam+=dam;
-        target->receiveDamage((int)ceil(dam));
+        double damage=ceil(damPer[i]*atk);
+        totalDam+=damage;
+        target->receiveDamage((int)ceil(damage));
         if(!target->isAlive()) {
             defeated=true;
             break;
@@ -774,14 +774,14 @@ int Jabra::specialSkill(Character* target, BattleContext& context) {
     // TODO: implement
     if(energy<18) return 0;
     energy-=18;
-    double dam=atk+ceil(atk*0.5);
-    if(hp<0.35*maxHp) dam=dam+ceil(dam*0.25);
-    target->receiveDamage((int)ceil(dam));
+    double damage=atk+ceil(atk*0.5);
+    if(hp<0.35*maxHp) damage=damage+ceil(damage*0.25);
+    target->receiveDamage((int)ceil(damage));
     if(!target->isAlive()) {
         defeated=true;
         context.morale-=5;
     }
-    return max(0, (int)(ceil(dam)) - target->getDef());
+    return max(0, (int)(ceil(damage)) - target->getDef());
 }
 
 void Jabra::endTurn(BattleContext& context) {
@@ -810,14 +810,14 @@ int Blueno::specialSkill(Character* target, BattleContext& context) {
     // TODO: implement
     if(energy<15) return 0;
     energy-=15;
-    double dam=atk+ceil(atk*0.3);
-    if(hp>0.5*maxHp) dam=dam+20;
-    else dam=dam+40;
-    target->receiveDamage((int)ceil(dam));
+    double damage=atk+ceil(atk*0.3);
+    if(hp>0.5*maxHp) damage=damage+20;
+    else damage=damage+40;
+    target->receiveDamage((int)ceil(damage));
     if(!target->isAlive()) {
         defeated=true;
     }
-    return max(0, (int)(ceil(dam)) - target->getDef());
+    return max(0, (int)(ceil(damage)) - target->getDef());
 }
 
 void Blueno::endTurn(BattleContext& context) {
@@ -850,8 +850,8 @@ int Kalifa::specialSkill(Character* target, BattleContext& context) {
     // TODO: implement
     if(energy<18) return 0;
     energy-=18;
-    double dam=atk+ceil(atk*0.4);
-    target->receiveDamage((int)ceil(dam));
+    double damage=atk+ceil(atk*0.4);
+    target->receiveDamage((int)ceil(damage));
     if(!target->isAlive()) {
         defeated=true;
     }
@@ -863,7 +863,7 @@ int Kalifa::specialSkill(Character* target, BattleContext& context) {
         context.morale-=8;
         target->setSpeed(target->getSpeed()-6);
     }
-    return max(0, (int)(ceil(dam)) - target->getDef());
+    return max(0, (int)(ceil(damage)) - target->getDef());
 }
 
 void Kalifa::endTurn(BattleContext& context) {
@@ -891,13 +891,13 @@ int Kumadori::specialSkill(Character* target, BattleContext& context) {
     // TODO: implement
     if(energy<16) return 0;
     energy-=16;
-    double dam=30+ceil(0.1*doriki);
-    if(hp<0.4*maxHp) dam=dam+25;
-    target->receiveDamage((int)ceil(dam));
+    double damage=30+ceil(0.1*doriki);
+    if(hp<0.4*maxHp) damage=damage+25;
+    target->receiveDamage((int)ceil(damage));
     if(!target->isAlive()) {
         defeated=true;
     }
-    return max(0, (int)(ceil(dam)) - target->getDef());
+    return max(0, (int)(ceil(damage)) - target->getDef());
 }
 
 void Kumadori::endTurn(BattleContext& context) {
@@ -929,14 +929,14 @@ int Fukurou::specialSkill(Character* target, BattleContext& context) {
     // TODO: implement
     if(energy<14) return 0;
     energy-=14;
-    double dam=atk+ceil(atk*0.3);
-    if(target->getHP()==context.low) dam=dam+20;
-    target->receiveDamage((int)ceil(dam));
+    double damage=atk+ceil(atk*0.3);
+    if(target->getHP()==context.low) damage=damage+20;
+    target->receiveDamage((int)ceil(damage));
     if(!target->isAlive()) {
         defeated=true;
         context.morale-=6;
     }
-    return max(0, (int)(ceil(dam)) - target->getDef());
+    return max(0, (int)(ceil(damage)) - target->getDef());
 }
 
 void Fukurou::endTurn(BattleContext& context) {
