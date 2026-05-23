@@ -5,9 +5,15 @@ using namespace std;
 
 int main(int argc, const char * argv[]) {
 
-    string inputFile = "input_1.txt";
+    // Mặc định là input_1.txt nếu không truyền gì vào
+    string inputFile = "input_1.txt"; 
     
-    cout << "=== LOADING BATTLE FROM FILE ===" << endl;
+    // Nếu có truyền tham số từ dòng lệnh (ví dụ: ./main input_2.txt)
+    if (argc > 1) {
+        inputFile = argv[1];
+    }
+    
+    cout << "=== LOADING BATTLE FROM FILE: " << inputFile << " ===" << endl;
     EniesLobbyBattle battle(inputFile);
     
     cout << "\n=== RUNNING BATTLE ===" << endl;

@@ -91,9 +91,44 @@ Example:
 
 ---
 
-## ⚙️ 4. How to Run the Program
+## ⚙️ 4. How to Build and Run the Program
 
-### Compile:
+This project uses **CMake** for configuration and building, and includes a **Python script** for automatic testcase grading with a clean terminal layout.
+
+### Configuration & Compilation (via CMake)
+
+Open your terminal at the root directory of the project and run the following commands:
+
 ```bash
-g++ -o main main.cpp eniesLobby.cpp -I . -std=c++11
-./main
+# 1. Create a build directory and enter it
+mkdir build && cd build
+
+# 2. Configure the project using CMake
+cmake ..
+
+# 3. Compile the source code into an executable
+cmake --build . --config Debug
+### Terminal
+### Running the Auto-Grader System
+
+To test all `input_*.txt` files inside the `testcase/` directory and calculate your final score automatically:
+
+1. Navigate back to the **root directory** of the project.
+2. Execute the python script:
+
+```bash
+python run_test.py
+
+==================================================
+            ENIES LOBBY GRADING SYSTEM            
+==================================================
+
+👉 [1/3] Running: input_1.txt... [PASSED] (+3.0 pts)
+👉 [2/3] Running: input_2.txt... [PASSED] (+3.0 pts)
+👉 [3/3] Running: input_3.txt... [PASSED] (+3.0 pts)
+
+==================================================
+SUMMARY REPORT:
+✅ Total Passed: 3/3
+⭐ Total Score: 9.0 / 9.0 points
+==================================================

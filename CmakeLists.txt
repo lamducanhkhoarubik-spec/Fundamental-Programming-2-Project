@@ -1,0 +1,43 @@
+cmake_minimum_required(VERSION 3.12)
+project(EniesLobbyBattleSystem LANGUAGES CXX)
+
+set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+
+# Bật tính năng tạo testcase của CMake
+enable_testing()
+
+# Tạo file thực thi chính từ main.cpp và các file source của bạn
+# Sửa lại danh sách file .cpp thực tế của bạn ở đây nếu có thêm file khác nhé
+add_executable(eniesLobby_bin main.cpp eniesLobby.cpp)
+
+# ----------------------------------------------------------------
+# ĐOẠN CODE QUÉT VÀ CHẠY TESTCASE TỰ ĐỘNG:
+# ----------------------------------------------------------------
+
+# 1. Tìm tất cả các file .txt trong thư mục testcase/
+# Sửa từ *.txt thành input_*.txt để chỉ lọc các file test thực sự
+# ... (Giữ nguyên phần đầu cho đến đoạn file(GLOB...))
+
+# Tìm các file input_*.txt trong thư mục testcase/
+file(GLOB TEST_FILES "${CMAKE_CURRENT_SOURCE_DIR}/testcase/input_*.txt")
+
+# Cấu hình số điểm cho mỗi testcase (ví dụ: 3.33 điểm/câu, hoặc 3 điểm/câu)
+set(DIEM_MOI_CAU "3.0")
+
+foreach(FILE_PATH ${TEST_FILES})
+    get_filename_component(FILE_NAME ${FILE_PATH} NAME)
+    
+    # Đặt tên testcase hiển thị
+    set(TEST_NAME "Test_${FILE_NAME}")
+    
+    # 1. Đăng ký testcase
+    add_test(NAME ${TEST_NAME} COMMAND eniesLobby_bin "${FILE_PATH}")
+    
+    # 2. LÀM ĐẸP & TÍNH ĐIỂM: Gắn nhãn điểm số và format vào testcase
+    set_tests_properties(${TEST_NAME} PROPERTIES
+        LABELS "EniesLobby_Assignment"
+        # Định dạng môi trường giả lập để CTest gom nhóm đẹp hơn
+        ENVIRONMENT "TEST_SCORE=${DIEM_MOI_CAU}"
+    )
+endforeach()
