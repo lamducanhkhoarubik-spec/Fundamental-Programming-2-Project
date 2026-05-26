@@ -5,7 +5,7 @@ import glob
 # Configuration
 EXE_PATH = os.path.join("build", "Debug", "eniesLobby_bin.exe")
 TESTCASE_DIR = "testcase"
-SCORE_PER_TEST = 3.0  # Modify this value to change points per test
+SCORE_PER_TEST = 2.0  # Modify this value to change points per test
 
 # Terminal ANSI escape colors for styling
 GREEN = "\033[92m"
