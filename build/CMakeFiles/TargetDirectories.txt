@@ -1,4 +1,0 @@
-C:/Users/ACER/Documents/Fundametal Programming/Fundametal_Programming_2_Project/Fundamental-Programming-2-Project/build/CMakeFiles/eniesLobby_bin.dir
-C:/Users/ACER/Documents/Fundametal Programming/Fundametal_Programming_2_Project/Fundamental-Programming-2-Project/build/CMakeFiles/RUN_TESTS.dir
-C:/Users/ACER/Documents/Fundametal Programming/Fundametal_Programming_2_Project/Fundamental-Programming-2-Project/build/CMakeFiles/ALL_BUILD.dir
-C:/Users/ACER/Documents/Fundametal Programming/Fundametal_Programming_2_Project/Fundamental-Programming-2-Project/build/CMakeFiles/ZERO_CHECK.dir
