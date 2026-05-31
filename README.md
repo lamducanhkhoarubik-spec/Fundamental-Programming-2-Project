@@ -122,7 +122,7 @@ pip install colorama
 python cham_diem.py
 ```
 🖥️ Live Terminal Presentation Layout Example
-Plaintext
+```Plaintext
 ╔══════════════════════════════════════════════════════════════╗
 ║              ENIES LOBBY AUTOMATED GRADING SYSTEM            ║
 ╚══════════════════════════════════════════════════════════════╝
