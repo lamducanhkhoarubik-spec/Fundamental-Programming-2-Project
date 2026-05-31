@@ -9,7 +9,7 @@ enable_testing()
 
 # Create the main executable from main.cpp and your source files
 # Update the source file list here if you add any extra .cpp files later
-add_executable(eniesLobby_bin main.cpp eniesLobby_1.cpp )
+add_executable(eniesLobby_bin main.cpp sample.cpp )
 
 # ----------------------------------------------------------------
 # AUTOMATIC TESTCASE DISCOVERY AND CONFIGURATION:

@@ -5,7 +5,7 @@ import glob
 # Configuration
 EXE_PATH = os.path.join("build", "Debug", "eniesLobby_bin.exe")
 TESTCASE_DIR = "testcase"
-SCORE_PER_TEST = 2.0  # Modify this value to change points per test
+SCORE_PER_TEST = 2.0  
 
 # Terminal ANSI escape colors for styling
 GREEN = "\033[92m"
@@ -28,7 +28,7 @@ def extract_expected_output(file_path):
         with open(file_path, "r", encoding="utf-8") as f:
             content = f.read()
         
-        # Look for the EXPECTED_OUTPUT: token to extract the trailing string
+        
         marker = "EXPECTED_OUTPUT:"
         if marker in content:
             return content.split(marker)[-1].strip()
@@ -77,10 +77,10 @@ def run_all_tests():
                 print(f" [{RED}{BOLD}CRASHED{RESET}]")
                 continue
                 
-            # 3. Retrieve the output string printed by your program
+           
             user_ans = get_final_result(result.stdout)
             
-            # 4. Compare output strings to determine the score
+           
             if user_ans == expected_ans:
                 print(f" [{GREEN}{BOLD}PASSED{RESET}] (+{SCORE_PER_TEST} pts)")
                 passed_tests += 1
@@ -93,7 +93,6 @@ def run_all_tests():
         except subprocess.TimeoutExpired:
             print(f" [{RED}{BOLD}TIMEOUT{RESET}]")
 
-    # Final Summary Report Calculation
     total_score = passed_tests * SCORE_PER_TEST
     max_score = total_tests * SCORE_PER_TEST
     
@@ -104,6 +103,6 @@ def run_all_tests():
     print(f"{BOLD}{CYAN}=================================================={RESET}\n")
 
 if __name__ == "__main__":
-    # Force Windows Terminal to support ANSI color coding escape tags
+    
     os.system("") 
     run_all_tests()
