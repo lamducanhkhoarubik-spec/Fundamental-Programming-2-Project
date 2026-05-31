@@ -1,1 +1,1 @@
-g++ -o main main.cpp eniesLobby.cpp -I . -std=c++11 && ./main
+g++ -o main main.cpp eniesLobby_1.cpp -I . -std=c++11 && ./main

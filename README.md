@@ -1,7 +1,6 @@
-# ⚓ Programming Fundamental Project 2: ONE PIECE Arc Water 7 - Enies Lobby (Part 2)
+# ⚓ Writing a Grading System for the Project: One Piece Arc Water 7 - Enies Lobby (Part 2)
 
-Welcome to the **Programming-fundamental-project-2** repository!  
-This repo contains necessary files and folders for this assignment. Follow to make most of it.
+Welcome to the automated grading framework and project workspace repository for the **Programming-fundamental-project-2** assignment! This document contains the full project specifications along with setup guides for the multi-platform automated evaluation engine.
 
 ---
 
@@ -91,44 +90,59 @@ Example:
 
 ---
 
-## ⚙️ 4. How to Build and Run the Program
+## 🛠️ 4. Automation Architecture & Scripts
 
-This project uses **CMake** for configuration and building, and includes a **Python script** for automatic testcase grading with a clean terminal layout.
+To automate batch-testing across multiple student submissions, this grading framework orchestrates cross-platform compilation toolchains with an execution monitor script:
 
-### Configuration & Compilation (via CMake)
+* **`runt.bat` (Windows Command Script):** Targets environments using the Microsoft Visual Studio compiler toolchain. It silently handles working directory routing and invokes CMake (`cmake --build build --config Debug`) to assemble source code cleanly into `build\Debug\eniesLobby_bin.exe`.
+* **`runt.sh` (Linux/macOS Shell Script):** Handles the equivalent UNIX environment routing, executing local automated compilation routines via standard POSIX `make` or `ninja` utilities.
+* **`cham_diem.py` (Python Core Engine):** The evaluation conductor. It scans the student folder, iteratively overwrites target templates, executes backend compiler triggers, manages file spoofing mechanisms, and formats final evaluations into a spreadsheet log.
 
-Open your terminal at the root directory of the project and run the following commands:
+### 🌟 Core Grading Engine Features
+* **Dynamic File Spoofing Manipulation:** Since submissions use physical file readers (`ifstream infile("input_1.txt")`), the Python script overrides system limitations by dynamically drafting a spoofed temporary `input_1.txt` at the root directory before launching execution, erasing it smoothly afterward.
+* **Tokenized Content Validation:** Strips away absolute string mismatches stemming from styling frames (`=== RUNNING BATTLE ===`), trailing newlines, or whitespace indents. Evaluation is token-based; if the ground truth block matches the parsed execution pattern anywhere within the data flow, a pass is recorded.
+* **Colorized Terminal Layout Dashboard:** Integrates ANSI styling variables to cleanly structure grading logs, track processing compilation states dynamically, and issue explicit comparison feedback when checks fail.
+
+---
+
+## ⚙️ 5. How to Set Up and Run the Grader System
+
+Follow these instructions to configure your local compilation environment and initialize batch grading:
+
+### Step 1: Install Interface Dependencies
+Ensure that your development terminal has Python available. Run the following command to install the required interactive coloring library:
+```bash
+pip install colorama
+```
+### Step 2: Run the Auto-Grader Sequence
+* **Insert all students' submission to folder `./submit`
+* **Open a command prompt or terminal shell at the project root directory and trigger the test sequence block:
 
 ```bash
-# 1. Create a build directory and enter it
-mkdir build && cd build
+python cham_diem.py
+```
+🖥️ Live Terminal Presentation Layout Example
+Plaintext
+╔══════════════════════════════════════════════════════════════╗
+║              ENIES LOBBY AUTOMATED GRADING SYSTEM            ║
+╚══════════════════════════════════════════════════════════════╝
+[*] Found 2 submission(s) and 8 testcase(s).
+[+] Starting core engine...
 
-# 2. Configure the project using CMake
-cmake ..
+┌─── [1/2] ───────────────────────────────────────────────────┐
+│ STUDENT ID: khoa                                             │
+└─────────────────────────────────────────────────────────────┘
+ 🔨 Compilation Phase: SUCCESSFUL!                                   
+ 📑 Executing test pipeline:
+   ├─ PASSED ── input_1.txt
+   ├─ PASSED ── input_2.txt
+   ├─ FAILED ── input_3.txt
+   │   ├── [Expected Key]: STRAW_HAT_WIN_BY_DEFEAT_CP9 6 20 50 50
+   │   └── [Student Out ] : TIME_OUT 0 0 0 0...
+   ├─ PASSED ── input_4.txt
+   ...
+   └── 📊 FINAL METRICS: Passed 7/8 cases ──>  SCORE: 21.0 
 
-# 3. Compile the source code into an executable
-cmake --build . --config Debug
-### Terminal
-### Running the Auto-Grader System
-
-To test all `input_*.txt` files inside the `testcase/` directory and calculate your final score automatically:
-
-1. Navigate back to the **root directory** of the project.
-2. Execute the python script:
-
-```bash
-python run_test.py
-
-==================================================
-            ENIES LOBBY GRADING SYSTEM            
-==================================================
-
-👉 [1/3] Running: input_1.txt... [PASSED] (+3.0 pts)
-👉 [2/3] Running: input_2.txt... [PASSED] (+3.0 pts)
-👉 [3/3] Running: input_3.txt... [PASSED] (+3.0 pts)
-
-==================================================
-SUMMARY REPORT:
-✅ Total Passed: 3/3
-⭐ Total Score: 9.0 / 9.0 points
-==================================================
+🎉 GRADING ENGINE PIPELINE TERMINATED! Results exported to: grading_results.csv
+Step 4: Review Grade Book Records
+Once grading processes terminate completely, an aggregated data spreadsheet called grading_results.csv will be generated inside the project root folder, providing an optimized record of all student outcomes.
