@@ -19,7 +19,7 @@ except ImportError:
 # ⚙️ PATH CONFIGURATION
 # =================================================================
 SUBMIT_DIR = "submit"
-TARGET_FILE = "eniesLobby_1.cpp" 
+TARGET_FILE = "sample.cpp" 
 BAT_FILE = "runt.bat"             
 EXE_PATH = r"build\Debug\eniesLobby_bin.exe" 
 TESTCASE_DIR = "testcase"
@@ -78,7 +78,10 @@ def main():
     score_board = []
 
     for idx, file_name in enumerate(student_files, 1):
-        student_id = file_name.split('_')[0]
+        if '_' in file_name:
+          student_id = file_name.split('_')[0]
+        else:
+          student_id = file_name.replace('.cpp', '')
         
         # Student Dashboard Header
         print(Fore.WHITE + Style.BRIGHT + f"┌─── [{idx}/{len(student_files)}] ───────────────────────────────────────────────────┐")
